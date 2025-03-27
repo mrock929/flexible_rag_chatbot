@@ -12,7 +12,7 @@ from llama_index.core import Document
 from dotenv import load_dotenv
 from openai import OpenAI
 
-INPUT_DATA_PATH = ".\data\*.pdf"
+INPUT_DATA_PATH = "./data/*.pdf"
 DB_PATH = "./data/chromadb/"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 20

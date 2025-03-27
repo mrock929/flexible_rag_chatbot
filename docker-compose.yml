@@ -1,0 +1,15 @@
+# version: '3.8'
+
+services:
+  flexible-rag-chatbot:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data  # Mount local /data folder to /app/data in the container
+      - ./models:/app/models  # Mount local /models folder to /app/models in the container
+    environment:
+      - PYTHONUNBUFFERED=1
+    # depends_on:
+    #   - models
+    #   - data
