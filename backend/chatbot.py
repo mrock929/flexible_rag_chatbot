@@ -3,9 +3,12 @@
 from typing import List
 
 from chromadb import Collection
+from ollama import Client
 from openai import OpenAI
 
 NUM_RESULTS = 5
+MODEL_TYPE = "local" # "openai" or "local"
+LOCAL_MODEL_NAME = "llama3.2" # Name of the local model inside the models directory, leave as "" if using openai
 
 
 def query_chatbot(query: str, index: Collection, openai_client: OpenAI, history: List[dict]) -> str:
@@ -49,9 +52,8 @@ def generate_response(context: dict, client: OpenAI, query: str, history: List[d
         str: The Gen AI generated response to the user query
     """
 
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
+    if MODEL_TYPE == "openai":
+        message = [
             {
                 "role": "system",
                 "content": [
@@ -76,10 +78,37 @@ def generate_response(context: dict, client: OpenAI, query: str, history: List[d
                     }
                 ],
             },
-        ],
-    )
+        ]
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=message,
+        )
+        return completion.choices[0].message.content
+    elif MODEL_TYPE == "local":
+        message = [
+            {
+                "role": "system",
+                "content": f"You are an assistant that helps answer user questions based on the supplied context. Only answer using the below context. \
+                If the context doesn't have the information needed to answer the question, just answer with 'I don't know the answer.'.\
+                BEGIN CONTEXT:\
+                {context['documents']}\
+                END CONTEXT"
+            },
+            {
+                "role": "user",
+                "content": f"BEGIN USER QUERY:\
+                {query}\
+                END USER QUERY"
+            },
+        ]
 
-    return completion.choices[0].message.content
+        client = Client(host='http://host.docker.internal:11434')
+        response = client.chat(model=LOCAL_MODEL_NAME, messages=message)
+
+        return response.message.content
+    else:
+        print("MODEL_TYPE must be openai or local")
+        return ""
 
 
 def compile_full_response(context: dict, response: str) -> dict:
