@@ -42,9 +42,8 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Once the application has stopped, type `docker-compose down` into the terminal to stock the Docker container.
 
 # TODO
-* Add /data and /models folders to the repo, but not anything in them
-* Read/skim research paper (/data)
-* Dig into embedding repo and implement (https://github.com/mims-harvard/Clinical-knowledge-embeddings)
+* For local model, make sure it only uses the context
+* Set up promptfoo, integrate, add test cases, run using a button
 * Streamlit home page - Config/data prep and chatbot pages
 * Config page: Select model (volume mount /models), model params (GPU y/n, etc.), button to ingest/embed data (volume mount /data) and create db (/data/db) for use later. Select embedding method (Open AI vs medical)
 * Chatbot page: Chatbot interface.
@@ -60,4 +59,5 @@ Nice to haves
 * Chatbot clear history button
 * Suggested prompts, some kind of article summary at top or "You can ask questions about..."
 * Be able to handle "Provide a summary of the article/paper/etc." Add abstract to prompt to allow for summarization without context
+* Use a medical embedding model
 

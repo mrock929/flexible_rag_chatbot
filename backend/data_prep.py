@@ -12,8 +12,6 @@ from llama_index.core import Document
 from dotenv import load_dotenv
 from openai import OpenAI
 
-INPUT_DATA_PATH = "./data/*.pdf"
-DB_PATH = "./data/chromadb/"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 20
 
@@ -57,7 +55,7 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
         Tuple[List[List[str]], List[str]]: Tuple with the list of raw text per document (one entry per page), and a list of the filenames.
     """
 
-    files = glob.glob(INPUT_DATA_PATH)
+    files = glob.glob("./data/*.pdf")
     extracted_files = []
     extracted_filenames = []
     for file in files:
@@ -118,7 +116,7 @@ def manage_db() -> chromadb.Collection:
     Returns:
         chromadb.Collection: Persistent ChromaDB collection (vector db/vectorstore)
     """
-    chroma_client = chromadb.PersistentClient(path=DB_PATH)
+    chroma_client = chromadb.PersistentClient(path="./data/chromadb/")
 
     # Create a collection if it doesn't already exist, default embedding model is Sentence Transformer (SBERT)
     collection = chroma_client.get_or_create_collection(

@@ -27,7 +27,7 @@ def init_function() -> Tuple[Collection, OpenAI]:
 
 index, openai_client = init_function()
 
-st.title("RAG Chatbot")
+st.title("Flexible RAG Chatbot")
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -52,5 +52,14 @@ if prompt := st.chat_input("Type in your question."):
             index=index,
             openai_client=openai_client,
             history=st.session_state.messages,
-        )
-    st.session_state.messages.append({"role": "assistant", "content": st.write(response["response"] + "\n\n**Sources:**\n\n" + str(response["sources"]))})
+        )   
+        st.write(response["response"])
+
+        # Display sources
+        # Get unique list of pages used (we can have multiple chunks used per page)
+        unique_sources = list(dict.fromkeys(response["sources"]))
+        with st.expander("Sources"):
+            for i, source in enumerate(unique_sources):
+                st.write(f"{i+1}. {source}")
+    # st.session_state.messages.append({"role": "assistant", "content": st.write(response["response"] + "\n\n**Sources:**\n\n" + str(response["sources"]))})
+    st.session_state.messages.append({"role": "assistant", "content": response["response"]})
