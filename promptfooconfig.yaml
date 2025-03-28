@@ -1,0 +1,8 @@
+providers:
+  - id: file://./backend/custom_provider.py
+tests:
+  - vars:
+      prompt: 'How does the HER-2/neu gene affect breast cancer'
+    assert:
+      - type: contains
+        value: 'breast cancer'

@@ -35,22 +35,32 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Start Ollama
 1. In the project root, run `docker-compose build` in a terminal.
     1. If no code changes have happened, you will only have to do this step the first time.
-1. Once that completes, run `docker-compose up`
+1. Once that completes, run `docker-compose up flexible-rag-chatbot`
 1. Once that is done you should see some URLs in the terminal. Copy the Local URL into a browser (Chrome recommended) to access the app.
 1. Once you are done using the app, close the browser tab.
 1. Then, use control + c to stop the docker container in the terminal.
 1. Once the application has stopped, type `docker-compose down` into the terminal to stock the Docker container.
 
+## Running the testing framework in Docker
+1. Be sure Docker Desktop is running.
+1. Start Ollama
+1. In the project root, run `docker-compose build` in a terminal.
+    1. If no code changes have happened, you will only have to do this step the first time.
+1. Once that completes, run `docker-compose run test` to run the promptfoo-based test suite. Results will be saved to /data/promptfoo_test_output.json.
+
 # TODO
-* For local model, make sure it only uses the context
-* Set up promptfoo, integrate, add test cases, run using a button
+* Get promptfoo working without having to set up embedding model each time
+* Set up test cases for promptfoo
+* For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this)
+* Actually make openai optional, distangle - test and confirm
 * Streamlit home page - Config/data prep and chatbot pages
 * Config page: Select model (volume mount /models), model params (GPU y/n, etc.), button to ingest/embed data (volume mount /data) and create db (/data/db) for use later. Select embedding method (Open AI vs medical)
 * Chatbot page: Chatbot interface.
-* Evaluation framework. Testing page in UI, but use promptfoo on backend. Save results to testing DB.
+* Evaluation framework. Testing page in UI, but use promptfoo on backend. Save results to testing DB. (or use docker-compose run test)
 * Add thumbs up/down per response. Log this data along with query, reponse, sources, etc. in DB for RL or other improvements later.
 * For CI, likely just describe
 * Error handling
+* Consider adding a doc similarity threshold for retriever, trying other retrievers
 * Implement unit testing
 * Pick a license, make public
 
@@ -59,5 +69,6 @@ Nice to haves
 * Chatbot clear history button
 * Suggested prompts, some kind of article summary at top or "You can ask questions about..."
 * Be able to handle "Provide a summary of the article/paper/etc." Add abstract to prompt to allow for summarization without context
+* Remove llamaindex dependency 
 * Use a medical embedding model
 

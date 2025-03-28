@@ -12,7 +12,7 @@ LOCAL_MODEL_NAME = "llama3.2" # Name of the local model inside the models direct
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
 
 
-def query_chatbot(query: str, index: Collection, openai_client: OpenAI, history: List[dict]) -> str:
+def query_chatbot(query: str, index: Collection, openai_client: OpenAI, history: List[dict]) -> dict:
     """
     Retrieves context based on the user query and then generates a response from the OpenAI client.
 
@@ -23,7 +23,7 @@ def query_chatbot(query: str, index: Collection, openai_client: OpenAI, history:
         history (List[dict]): History of the chat session
 
     Returns:
-        str: The response to the user's query from the OpenAI model
+        dict: The response to the user's query from the OpenAI model. Dictionary with "response" (str) and "sources" (List[str]).
     """
     context = retrieve_context(query=query, index=index)
     response = generate_response(context=context, client=openai_client, history=history)
@@ -55,7 +55,7 @@ def generate_response(context: dict, client: OpenAI, history: List[dict]) -> str
     message = [
             {
                 "role": "system",
-                "content": f"You are an assistant that helps answer user questions based on the supplied context. Only answer using the below context.\
+                "content": f"You are an assistant that answers user questions based only on the supplied context. Only answer using information in the supplied context.\
                 If the context doesn't have the information needed to answer the question, just answer with 'I don't know the answer.'.\
                 BEGIN CONTEXT:\
                 {context['documents']}\

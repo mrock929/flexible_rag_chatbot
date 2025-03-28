@@ -55,11 +55,12 @@ if prompt := st.chat_input("Type in your question."):
         )   
         st.write(response["response"])
 
-        # Display sources
         # Get unique list of pages used (we can have multiple chunks used per page)
         unique_sources = list(dict.fromkeys(response["sources"]))
+        
+        # Display sources
         with st.expander("Sources"):
             for i, source in enumerate(unique_sources):
                 st.write(f"{i+1}. {source}")
-    # st.session_state.messages.append({"role": "assistant", "content": st.write(response["response"] + "\n\n**Sources:**\n\n" + str(response["sources"]))})
+    
     st.session_state.messages.append({"role": "assistant", "content": response["response"]})

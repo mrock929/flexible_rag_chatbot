@@ -11,3 +11,14 @@ services:
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
     environment:
       - PYTHONUNBUFFERED=1
+
+  test:
+    build: .
+    volumes:
+      - ./data:/app/data  # Mount local /data folder to /app/data in the container
+      - ./models:/app/models  # Mount local /models folder to /app/models in the container
+    command: npx promptfoo eval --output ./data/promptfoo_test_output.json
+    # environment:
+    #   - STREAMLIT_ENV=testing
+    depends_on:
+      - flexible-rag-chatbot
