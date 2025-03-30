@@ -1,24 +1,21 @@
 # version: '3.8'
 
 services:
-  flexible-rag-chatbot:
+  chatbot:
     build: .
     ports:
       - "8501:8501"
-      - "11434:11434"
     volumes:
       - ./data:/app/data  # Mount local /data folder to /app/data in the container
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
     environment:
       - PYTHONUNBUFFERED=1
 
-  test:
+  tests:
     build: .
     volumes:
       - ./data:/app/data  # Mount local /data folder to /app/data in the container
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
-    command: npx promptfoo eval --output ./data/promptfoo_test_output.json
-    # environment:
-    #   - STREAMLIT_ENV=testing
+    command: npx promptfoo eval --output ./data/promptfoo_test_output.json  # Run promptfoo test suite
     depends_on:
-      - flexible-rag-chatbot
+      - chatbot
