@@ -25,8 +25,6 @@ def prepare_data() -> Tuple[chromadb.Collection, OpenAI]:
     """
 
     openai_client = openai_setup()
-    collection = manage_db()
-    print("db setup")
 
     if not os.path.isfile('./data/chromadb/chroma.sqlite3'):
         # Only read and chunk data if the DB doesn't exist
@@ -34,8 +32,13 @@ def prepare_data() -> Tuple[chromadb.Collection, OpenAI]:
         print("Files read")
         documents = chunk_data(docs=file_text, doc_names=filenames)
         print("Data chunked")
+        collection = manage_db()
+        print("db setup")
         upsert_db(collection=collection, data=documents)
         print("data added to db")
+    else:
+        collection = manage_db()
+        print("db setup")
 
     return collection, openai_client
 

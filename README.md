@@ -31,8 +31,8 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Clone repo
 
 ## Data Setup
-1. Put the PDF file(s) you want to ask questions about into the /data directory.
-1. If you want to update these PDF files after starting the app for the first time, delete the database at /data/chromadb/chroma.sqlite3 and restart the app.
+1. Put the PDF file(s) you want to ask questions about into the /data directory. This chatbot will only ingest PDF files.
+1. If you want to update these PDF files after starting the app for the first time (if the files changed or new data is added to /data), delete the /data/chromadb folder and restart the app.
 
 ## Running the app in Docker
 1. Be sure Docker Desktop is running.
@@ -55,9 +55,7 @@ This approach should be used if the machine running this app has a strong GPU or
 
 # TODO
 * Remove llamaindex dependency 
-* Streamlit home page - Config/data prep and chatbot pages
-* Config page: Select model (volume mount /models), model params (GPU y/n, etc.), button to ingest/embed data (volume mount /data) and create db (/data/db) for use later. Select embedding method (Open AI vs medical)
-* Chatbot page: Chatbot interface.
+* Chatbot page: Chatbot interface. Add model select dropdown and put history clear both in side panel.
 
 * Separate interview branch for below
 * Remove openai - test and confirm
