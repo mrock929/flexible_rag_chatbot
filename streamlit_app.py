@@ -1,31 +1,32 @@
 # This file controls the UI action in the streamlit app
 
-from typing import Tuple
+from typing import Tuple, List
 
 from chromadb import Collection
 from openai import OpenAI
 import streamlit as st
 
-from backend.data_prep import prepare_data
+from backend.data_prep import prepare_data, get_available_models
 from backend.chatbot import query_chatbot
 
 
 # Initialize DB and OpenAI Client at start only
 @st.cache_resource
-def init_function() -> Tuple[Collection, OpenAI]:
+def init_function() -> Tuple[Collection, OpenAI, List[str]]:
     """
     Initialize the backend. This includes ingesting data, connecting to the vector database, and setting up the OpenAI client.
     This only runs on app startup.
 
     Returns:
-        Tuple[Collection, OpenAI]: A tuple with the embedded and chunked data and the OpenAI client.
+        Tuple[Collection, OpenAI]: A tuple with the DB containing the embedded and chunked data, the OpenAI client, and the list of available models.
     """
     index, openai_client = prepare_data()
+    model_list = get_available_models()
 
-    return index, openai_client
+    return index, openai_client, model_list
 
 
-index, openai_client = init_function()
+index, openai_client, model_list = init_function()
 
 st.title("Flexible RAG Chatbot")
 
@@ -50,6 +51,7 @@ if prompt := st.chat_input("Type in your question."):
         response = query_chatbot(
             query=prompt,
             index=index,
+            model=st.session_state.model,
             openai_client=openai_client,
             history=st.session_state.messages,
         )   
@@ -68,5 +70,10 @@ if prompt := st.chat_input("Type in your question."):
 def clear_chat_history():
     st.session_state.messages = []
 
-st.button(label="Clear History", key="chat_clear", on_click=clear_chat_history)
+with st.sidebar:
+    st.session_state.model = st.selectbox(
+        "Model Selection", model_list
+    )
+
+    st.button(label="Clear History", key="chat_clear", on_click=clear_chat_history)
     

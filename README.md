@@ -41,6 +41,7 @@ This approach should be used if the machine running this app has a strong GPU or
     1. If no code changes have happened, you will only have to do this step the first time.
 1. Once that completes, run `docker-compose up chatbot`
 1. Once that is done you should see some URLs in the terminal. Copy the Local URL into a browser (Chrome recommended) to access the app.
+1. Be sure to select the model you want to use from the sidebar.
 1. Once you are done using the app, close the browser tab.
 1. Then, use control + c to stop the docker container in the terminal.
 1. Once the application has stopped (sometimes it just hangs, so start typing anyways), type `docker-compose down` into the terminal to stock the Docker container.
@@ -58,6 +59,7 @@ This approach should be used if the machine running this app has a strong GPU or
 
 * Separate interview branch for below
 * Remove openai - test and confirm
+* Error handling for no open source models installed
 * Get promptfoo working without having to set up embedding model each time
 * Set up test cases for promptfoo
 * For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this)

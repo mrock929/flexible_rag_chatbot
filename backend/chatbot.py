@@ -7,39 +7,39 @@ from ollama import Client
 from openai import OpenAI
 
 NUM_RESULTS = 5
-MODEL_TYPE = "openai" # "openai" or "local"
-LOCAL_MODEL_NAME = "llama3.2" # Name of the local model inside the models directory, leave as "" if using openai
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
 
 
-def query_chatbot(query: str, index: Collection, openai_client: OpenAI, history: List[dict]) -> dict:
+def query_chatbot(query: str, index: Collection, model: str, openai_client: OpenAI, history: List[dict]) -> dict:
     """
     Retrieves context based on the user query and then generates a response from the OpenAI client.
 
     Args:
         query (str): User query from the frontend
         index (Collection): Chunked and embedded text to retrieve from
+        model (str): The selected LLM to use for generating the response
         openai_client (OpenAI): OpenAI client to use for the chat response
         history (List[dict]): History of the chat session
 
     Returns:
         dict: The response to the user's query from the OpenAI model. Dictionary with "response" (str) and "sources" (List[str]).
     """
-    full_query = update_query(query=query, client=openai_client, history=history)
+    full_query = update_query(query=query, client=openai_client, model=model, history=history)
     print(f"query={query}\nfull query={full_query}\n")
     context = retrieve_context(query=full_query, index=index)
-    response = generate_response(context=context, client=openai_client, history=history)
+    response = generate_response(context=context, client=openai_client, model=model, history=history)
     chat_output = compile_full_response(context=context, response=response)
 
     return chat_output
 
 
-def update_query(query: str, client: OpenAI, history: List[dict]) -> str:
+def update_query(query: str, model: str, client: OpenAI, history: List[dict]) -> str:
     """
     Update the user query based on the conversation context using the selected LLM
 
     Args:
         query (str): User query from frontend
+        model (str): LLM to use to update the query
         client (OpenAI): The OpenAI model to use for generating the response
         history (List[dict]): Chat history, including the user query
 
@@ -83,7 +83,7 @@ def update_query(query: str, client: OpenAI, history: List[dict]) -> str:
     for m in history[-MAX_HISTORY-1:]:
         message.append({"role": m["role"], "content": m["content"]})
 
-    return generate_completion(message=message, openai_client=client, model_type=MODEL_TYPE)
+    return generate_completion(message=message, openai_client=client, model=model)
 
 
 def retrieve_context(query: str, index: Collection) -> dict:
@@ -101,13 +101,14 @@ def retrieve_context(query: str, index: Collection) -> dict:
     return index.query(query_texts=[query], n_results=NUM_RESULTS)
 
 
-def generate_response(context: dict, client: OpenAI, history: List[dict]) -> str:
+def generate_response(context: dict, client: OpenAI, model: str, history: List[dict]) -> str:
     """
     Generate the response to the user query based on the supplied context, history, and user query.
 
     Args:
         context (dict): Retrieved context from source documents
         client (OpenAI): The OpenAI model to use for generating the response
+        model (str): The LLM to use to generate the response
         history (List[dict]): Chat history, including the user query
 
     Returns:
@@ -150,36 +151,33 @@ def generate_response(context: dict, client: OpenAI, history: List[dict]) -> str
     for m in history[-MAX_HISTORY-1:]:
         message.append({"role": m["role"], "content": m["content"]})
 
-    return generate_completion(message=message, openai_client=client, model_type=MODEL_TYPE)
+    return generate_completion(message=message, openai_client=client, model=model)
     
 
-def generate_completion(message: List[dict], openai_client: OpenAI, model_type: str) -> str:
+def generate_completion(message: List[dict], openai_client: OpenAI, model: str) -> str:
     """
     Generate the chat completion for the input message
 
     Args:
         message (List[dict]): Input message with relevant history and/or context
         openai_client (OpenAI): The OpenAI model to use for generating the response
-        model_type (str): "openai" or "local" that determines which model to use for chat completion
+        model (str): The model name to use for completion
 
     Returns:
         str: Chat completion output message
     """
 
-    if model_type == "openai":
+    if model == "gpt-4o-mini":
         completion = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=message,
         )
         return completion.choices[0].message.content
-    elif model_type == "local":
+    else:
         client = Client(host='http://host.docker.internal:11434')
-        response = client.chat(model=LOCAL_MODEL_NAME, messages=message)
+        response = client.chat(model=model, messages=message)
 
         return response.message.content
-    else:
-        print("MODEL_TYPE must be openai or local")
-        return ""
 
 
 def compile_full_response(context: dict, response: str) -> dict:

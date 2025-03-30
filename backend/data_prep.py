@@ -134,3 +134,19 @@ def insert_data_to_db(collection: chromadb.Collection, chunk_list: List[str], me
     """
 
     collection.add(documents=chunk_list, metadatas=metadata_list, ids=id_list)
+
+
+def get_available_models() -> List[str]:
+    """
+    Determines the available local models to run in the app that were previously pulled in Ollama.
+
+    Returns:
+        List[str]: List of all model names
+    """
+    model_list = ["gpt-4o-mini"]
+
+    model_paths = glob.glob("./models/manifests/registry.ollama.ai/library/*")
+    for model in model_paths:
+        model_list.append(model.split("/")[-1])
+
+    return model_list
