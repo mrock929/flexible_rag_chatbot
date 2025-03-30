@@ -64,3 +64,9 @@ if prompt := st.chat_input("Type in your question."):
                 st.write(f"{i+1}. {source}")
     
     st.session_state.messages.append({"role": "assistant", "content": response["response"]})
+
+def clear_chat_history():
+    st.session_state.messages = []
+
+st.button(label="Clear History", key="chat_clear", on_click=clear_chat_history)
+    

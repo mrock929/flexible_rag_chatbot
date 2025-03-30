@@ -43,7 +43,7 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Once that is done you should see some URLs in the terminal. Copy the Local URL into a browser (Chrome recommended) to access the app.
 1. Once you are done using the app, close the browser tab.
 1. Then, use control + c to stop the docker container in the terminal.
-1. Once the application has stopped, type `docker-compose down` into the terminal to stock the Docker container.
+1. Once the application has stopped (sometimes it just hangs, so start typing anyways), type `docker-compose down` into the terminal to stock the Docker container.
 
 ## Running the testing framework in Docker
 1. Be sure Docker Desktop is running.
@@ -54,13 +54,10 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Once you are done testing, run `docker-compose down` to stop the Docker container.
 
 # TODO
-* Chatbot clear history button
-* Be able to handle "Provide a summary of the article/paper/etc." Add abstract to prompt to allow for summarization without context
 * Remove llamaindex dependency 
 * Streamlit home page - Config/data prep and chatbot pages
 * Config page: Select model (volume mount /models), model params (GPU y/n, etc.), button to ingest/embed data (volume mount /data) and create db (/data/db) for use later. Select embedding method (Open AI vs medical)
 * Chatbot page: Chatbot interface.
-* Retrieval based on previous query/response and not just latest query, or rework query based on history using LLM
 
 * Separate interview branch for below
 * Remove openai - test and confirm
