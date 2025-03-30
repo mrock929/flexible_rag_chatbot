@@ -2,4 +2,6 @@ chromadb>=0.6.3
 llama-index>=0.12.22
 ollama>=0.4.7
 pypdf2>=3.0.1
+semchunk>=3.2.1
 streamlit>=1.42.2
+transformers>=4.50.3

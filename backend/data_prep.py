@@ -7,10 +7,10 @@ import os
 
 import chromadb
 from PyPDF2 import PdfReader
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core import Document
 from dotenv import load_dotenv
 from openai import OpenAI
+import semchunk
+from transformers import AutoTokenizer
 
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 20
@@ -30,15 +30,15 @@ def prepare_data() -> Tuple[chromadb.Collection, OpenAI]:
         # Only read and chunk data if the DB doesn't exist
         file_text, filenames = read_data()
         print("Files read")
-        documents = chunk_data(docs=file_text, doc_names=filenames)
+        chunk_list, metadata_list, id_list = chunk_data(docs=file_text, doc_names=filenames)
         print("Data chunked")
         collection = manage_db()
-        print("db setup")
-        upsert_db(collection=collection, data=documents)
+        print("db set up")
+        insert_data_to_db(collection=collection, chunk_list=chunk_list, metadata_list=metadata_list, id_list=id_list)
         print("data added to db")
     else:
         collection = manage_db()
-        print("db setup")
+        print("db set up")
 
     return collection, openai_client
 
@@ -77,7 +77,7 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
     return extracted_files, extracted_filenames
 
 
-def chunk_data(docs: List[List[str]], doc_names: List[str]) -> List[Document]:
+def chunk_data(docs: List[List[str]], doc_names: List[str]) -> Tuple[List[str], List[dict], List[str]]:
     """
     For all documents, break each page into smaller chunks for retrieval and embedding.
 
@@ -86,45 +86,35 @@ def chunk_data(docs: List[List[str]], doc_names: List[str]) -> List[Document]:
         doc_names (List[str]): List of document filenames
 
     Returns:
-        List[Document]: List of llamaindex Document objects ctonaining text, metadata (filename, page_number, chunk_number), and doc_id
+        Tuple[List[str], List[dict], List[str]]: List of text chunks, the associated metadata (filename, page_number, chunk_number), and doc id
     """
 
-    splitter = SentenceSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
-    )
+    chunker = semchunk.chunkerify(tokenizer_or_token_counter=AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2"), chunk_size=CHUNK_SIZE)
 
-    # For each page of text, chunk it based on below, maintain page number
-    documents = []
+    chunk_text = []
+    chunk_metadata = []
+    chunk_ids = []
     for i, doc in enumerate(docs):
         for j, page in enumerate(doc):
-            page_text = splitter.split_text(text=page)
-            for k, chunk in enumerate(page_text):
-                documents.append(
-                    Document(
-                        text=chunk,
-                        metadata={
-                            "filename": doc_names[i],
-                            "page_number": j + 1,
-                            "chunk_number": k,
-                        },
-                        doc_id=f"{doc_names[i]}_page{j}_chunk{k}",
-                    )
-                )
+            chunks = chunker(text_or_texts=page, overlap=CHUNK_OVERLAP)
+            for k, chunk in enumerate(chunks):
+                chunk_text.append(chunk)
+                chunk_metadata.append({"filename": doc_names[i], "page_number": j + 1, "chunk_number": k})
+                chunk_ids.append(f"{doc_names[i]}_page{j}_chunk{k}")
 
-    return documents
+    return chunk_text, chunk_metadata, chunk_ids
 
 
 def manage_db() -> chromadb.Collection:
     """
-    Create the persistent chroma db and set up the vectorstore.
+    Create the persistent chroma db and set up the vectorstore. If the collection already exists, connect to it.
 
     Returns:
-        chromadb.Collection: Persistent ChromaDB collection (vector db/vectorstore)
+        chromadb.Collection: Persistent ChromaDB collection (vectorstore)
     """
     chroma_client = chromadb.PersistentClient(path="./data/chromadb/")
 
-    # Create a collection if it doesn't already exist, default embedding model is Sentence Transformer (SBERT)
+    # Create a collection if it doesn't already exist, default embedding model is sentence-transformers/all-MiniLM-L6-v2
     collection = chroma_client.get_or_create_collection(
         name="docs", metadata={"hnsw:space": "cosine"}
     )
@@ -132,9 +122,15 @@ def manage_db() -> chromadb.Collection:
     return collection
 
 
-def upsert_db(collection, data: List[Document]) -> None:
+def insert_data_to_db(collection: chromadb.Collection, chunk_list: List[str], metadata_list: List[dict], id_list: List[str]) -> None:
+    """
+    Embed and add all chunks of data to the ChromaDB
 
-    # switch `add` to `upsert` to avoid adding the same documents every time
-    # TODO just send in the list, likely don't use Document or construct differently so more efficient
-    for doc in data:
-        collection.upsert(documents=doc.text, metadatas=doc.metadata, ids=doc.doc_id)
+    Args:
+        collection (chromadb.Collection): The ChromaDB collection set up in manage_db()
+        chunk_list (List[str]): List of text chunks
+        metadata_list (List[dict]): List of metadata (filename, page_number, chunk_number) for each chunk
+        id_list (List[str]): List of ids for each chunk
+    """
+
+    collection.add(documents=chunk_list, metadatas=metadata_list, ids=id_list)

@@ -54,7 +54,6 @@ This approach should be used if the machine running this app has a strong GPU or
 1. Once you are done testing, run `docker-compose down` to stop the Docker container.
 
 # TODO
-* Remove llamaindex dependency 
 * Chatbot page: Chatbot interface. Add model select dropdown and put history clear both in side panel.
 
 * Separate interview branch for below
@@ -62,9 +61,11 @@ This approach should be used if the machine running this app has a strong GPU or
 * Get promptfoo working without having to set up embedding model each time
 * Set up test cases for promptfoo
 * For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this)
+* Consider adding # embed_fcn = embedding_functions.HuggingFaceEmbeddingFunction(api_key="", model_name="medicalai/ClinicalBERT") back into manage_db if needed (need to add actual api_key), pair it with Switch chunker to from_pretrained("medicalai/ClinicalBERT")
+* Once prompt is set, check some prompt hacking queries
 * Add thumbs up/down per response. Log this data along with query, reponse, sources, etc. in DB for RL or other improvements later.
 * For CI, likely just describe
-* Error handling
+* Error handling/logging
 * Consider adding a doc similarity threshold for retriever, trying other retrievers
 * Implement unit testing
 * Pick a license, make public
