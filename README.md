@@ -38,7 +38,7 @@ This approach should be used if the machine running this app has a strong GPU or
 ## Running the app
 1. Start Docker Desktop.
 1. Start Ollama.
-1. In the project root, run `docker-compose build` in a terminal.
+1. In the project root, run `docker-compose build` in a terminal. This may take a few minutes.
     1. If no code changes have happened, you will only have to do this step the first time.
 1. Once that completes, run `docker-compose up chatbot`
 1. Once that is done you should see some URLs in the terminal. Copy the Local URL into a browser (Chrome recommended) to access the app.
