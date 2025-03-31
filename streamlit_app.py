@@ -3,30 +3,29 @@
 from typing import Tuple, List
 
 from chromadb import Collection
-from openai import OpenAI
 import streamlit as st
 
 from backend.data_prep import prepare_data, get_available_models
 from backend.chatbot import query_chatbot
 
 
-# Initialize DB and OpenAI Client at start only
+# Initialize DB at start only
 @st.cache_resource
-def init_function() -> Tuple[Collection, OpenAI, List[str]]:
+def init_function() -> Tuple[Collection, List[str]]:
     """
-    Initialize the backend. This includes ingesting data, connecting to the vector database, and setting up the OpenAI client.
+    Initialize the backend. This includes ingesting data and connecting to the vector database.
     This only runs on app startup.
 
     Returns:
-        Tuple[Collection, OpenAI]: A tuple with the DB containing the embedded and chunked data, the OpenAI client, and the list of available models.
+        Tuple[Collection, List[str]]: A tuple with the DB containing the embedded and chunked data and the list of available models.
     """
-    index, openai_client = prepare_data()
+    index = prepare_data()
     model_list = get_available_models()
 
-    return index, openai_client, model_list
+    return index, model_list
 
 
-index, openai_client, model_list = init_function()
+index, model_list = init_function()
 
 st.title("Flexible RAG Chatbot")
 
@@ -52,7 +51,6 @@ if prompt := st.chat_input("Type in your question."):
             query=prompt,
             index=index,
             model=st.session_state.model,
-            openai_client=openai_client,
             history=st.session_state.messages,
         )   
         st.write(response["response"])

@@ -1,9 +1,9 @@
 from typing import Dict, Any
 
-#from promptfoo.src.types import ProviderResponse
-
 from chatbot import query_chatbot
 from data_prep import prepare_data
+
+LOCAL_MODEL = "llama3.2"
 
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: #ProviderResponse:
     # Note: The prompt may be in JSON format, so you might need to parse it.
@@ -22,9 +22,10 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
     # The prompt is the final prompt string after the variables have been processed.
     # Custom logic to process the prompt goes here.
     # For instance, you might call an external API or run some computations.
-    index, openai_client = prepare_data()
+    index = prepare_data()
     
-    response = query_chatbot(query=prompt, index=index, openai_client=openai_client, history=[{"role": "user", "content": prompt}])
+    response = query_chatbot(query=prompt, index=index, model=LOCAL_MODEL, history=[{"role": "user", "content": prompt}])
+    # TODO likely change this to just get context and generate response directly without reworking input prompt, will be more consistent
 
     # The result should be a dictionary with at least an 'output' field.
     result = {

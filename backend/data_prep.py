@@ -8,7 +8,6 @@ import os
 import chromadb
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
-from openai import OpenAI
 import semchunk
 from transformers import AutoTokenizer
 
@@ -16,15 +15,13 @@ CHUNK_SIZE = 500
 CHUNK_OVERLAP = 20
 
 
-def prepare_data() -> Tuple[chromadb.Collection, OpenAI]:
+def prepare_data() -> chromadb.Collection:
     """
     Data preparation pipeline. Ingests documents, chunks them, and embeds them in a ChromaDB vectorstore.
 
     Returns:
-        Tuple[chromadb.Collection, OpenAI]: Tuple with the ChromaDB collection with the input document chunked and embedded and the OpenAI client
+        chromadb.Collection: ChromaDB collection with the input document chunked and embedded
     """
-
-    openai_client = openai_setup()
 
     if not os.path.isfile('./data/chromadb/chroma.sqlite3'):
         # Only read and chunk data if the DB doesn't exist
@@ -40,17 +37,7 @@ def prepare_data() -> Tuple[chromadb.Collection, OpenAI]:
         collection = manage_db()
         print("db set up")
 
-    return collection, openai_client
-
-
-def openai_setup() -> OpenAI:
-    """
-    Load the OpenAI API Key from the .env file and sets the OpenAI client
-    """
-    load_dotenv(Path("./.env"))
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
-    return client
+    return collection
 
 
 def read_data() -> Tuple[List[List[str]], List[str]]:
@@ -143,9 +130,12 @@ def get_available_models() -> List[str]:
     Returns:
         List[str]: List of all model names
     """
-    model_list = ["gpt-4o-mini"]
+    model_list = []
 
     model_paths = glob.glob("./models/manifests/registry.ollama.ai/library/*")
+    if len(model_paths) < 1:
+        raise OSError("No models were found in the /models/ directory. Be sure to download an open source model into the correct location. See README.md for more information.")
+    
     for model in model_paths:
         model_list.append(model.split("/")[-1])
 
