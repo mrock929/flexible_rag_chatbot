@@ -1,8 +1,14 @@
 providers:
-  - id: file://./backend/custom_provider.py
-tests:
-  - vars:
-      prompt: 'How does the HER-2/neu gene affect breast cancer'
-    assert:
-      - type: contains
-        value: 'breast cancer'
+  - id: file://backend/custom_provider.py
+# tests:
+#   - vars:
+#       prompt: 'How does the HER-2/neu gene affect breast cancer'
+#     assert:
+#       - type: contains
+#         value: 'breast cancer'
+tests: file://data/chatbot_tests.csv
+prompts: 
+  - "{{input}}"
+# defaultTest: # This sets the LLM used to evaluate LLM-based metrics
+#   options:
+#     provider: openai:gpt-4o-mini

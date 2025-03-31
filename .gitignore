@@ -1,5 +1,6 @@
 data/*
 !data/.gitkeep 
+!data/chatbot_tests.csv
 models/*
 !models/.gitkeep
 .env

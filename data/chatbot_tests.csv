@@ -1,0 +1,12 @@
+input,__expected,__metric
+What is the her2-neu gene?,"The HER-2/neu oncogene, also referred to as HER2 or HER2/neu, encodes for a protein that plays a role in cell signaling and proliferation. It is a member of the tyrosine kinase family and is more closely related to the epidermal growth factor receptor (EGFR) gene than other members of this family. The HER-2/neu gene has been found to be amplified in human breast cancer, often resulting in overexpression of the protein product, which can contribute to the development and progression of breast cancer.",contains-any
+Summarize this article in plain language,"The article is about a specific gene called HER-2/neu that is found in some breast cancers. Researchers studied how common this gene was in 189 different breast tumors and what it meant for the patients' chances of survival.
+
+They found that 30% of the tumors had an amplified version of the HER-2/neu gene, which means the gene made many copies of itself. They also discovered that this amplification was associated with worse outcomes for some patients.
+
+In other words, if a patient has a breast tumor with a lot of extra copies of the HER-2/neu gene, their chances of cancer coming back (relapse) are higher. Additionally, having more copies of the gene is linked to poorer overall survival rates.",contains-any
+What are the most important takeaways from this article?,"Based on the context and abstract, here are the most important takeaways from this article:
+
+    The HER-2/neu oncogene is amplified in 30% of primary human breast cancers.
+    Amplification of the HER-2/neu gene is associated with a poorer prognosis and shorter overall survival and time to relapse in patients with breast cancer.
+    HER-2/neu amplification has greater prognostic value than most currently used prognostic factors, including hormonal-receptor status, in lymph node-positive disease.",contains-any

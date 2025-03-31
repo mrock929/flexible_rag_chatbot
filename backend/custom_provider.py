@@ -5,7 +5,7 @@ from data_prep import prepare_data
 
 LOCAL_MODEL = "llama3.2"
 
-def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: #ProviderResponse:
+def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: 
     # Note: The prompt may be in JSON format, so you might need to parse it.
     # For example, if the prompt is a JSON string representing a conversation:
     # prompt = '[{"role": "user", "content": "Hello, world!"}]'

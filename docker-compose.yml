@@ -16,6 +16,6 @@ services:
     volumes:
       - ./data:/app/data  # Mount local /data folder to /app/data in the container
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
-    command: npx promptfoo eval --output ./data/promptfoo_test_output.json  # Run promptfoo test suite
+    command: npx promptfoo eval --output ./data/promptfoo_test_output.json --max-concurrency 2  # Run promptfoo test suite
     depends_on:
       - chatbot
