@@ -1,9 +1,10 @@
+# This file allows promptfoo to evaluate model outputs with the locally downloaded model
+
 from typing import Dict, Any
 
-from chatbot import query_chatbot
-from data_prep import prepare_data
+from chatbot import generate_completion
 
-LOCAL_TESTING_MODEL = "llama3.2"
+LOCAL_EVAL_MODEL = "llama3.2"
 
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: 
     # Note: The prompt may be in JSON format, so you might need to parse it.
@@ -22,14 +23,12 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
     # The prompt is the final prompt string after the variables have been processed.
     # Custom logic to process the prompt goes here.
     # For instance, you might call an external API or run some computations.
-    index = prepare_data()
     
-    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}])
-    # TODO likely change this to just get context and generate response directly without reworking input prompt, will be more consistent
+    response = generate_completion(message=[{"role": "user", "content": prompt}], model=LOCAL_EVAL_MODEL)
 
     # The result should be a dictionary with at least an 'output' field.
     result = {
-        "output": response["response"],
+        "output": response,
     }
 
     # if some_error_condition:

@@ -44,6 +44,7 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 
 ## Running the testing framework in Docker
 1. Start Docker Desktop and Ollama.
+1. **Go to 2 files, set which model you want to test and which model you want to use to eval the results in X files TODO**
 1. In the project root, run `docker-compose build` in a terminal.
     1. If no code changes have happened, you will only have to do this step the first time.
 1. Once that completes, run `docker-compose run tests` to run the promptfoo-based test suite. Results will be saved to /data/promptfoo_test_output.json.
@@ -53,17 +54,14 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 # TODO
 * Set up metrics and test cases for promptfoo
 * For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this)
+* Prompt tuning based on test results for llama3.2 and phi4, others?
 * Once prompt is set, check some prompt hacking queries
 * Add thumbs up/down per response. Log this data along with query, reponse, sources, etc. in DB for RL or other improvements later.
 * Consider adding a doc similarity threshold for retriever, trying other retrievers
 * Error handling/logging (No PDFs in /data)
-* Clean up streamlit code, check all code, run black
+* Clean up streamlit code, remove prints, check all code, run black
 * Pick a license, add branch protections, make public
-* Writeup. For CI, likely just describe in writeup
-* Install and run the model from inside the Docker container to avoid local Ollama download. Would likely want to be a separate Ollama model container in docker-compose. See, e.g. (https://github.com/mythrantic/ollama-docker/blob/main/docker-compose.yml). - hold for now, large increase in architectural complexity (3 Docker services, separate Dockerfiles so can run model pull command in ollama container after build - it's easy to install Ollama locally) - want to provide flexibility for users based on their machine, not have to change any Docker memory limits, etc. lots of limitations on the model if in Docker. Can add later if needed. Potential for additional latency.
+* Writeup.
 
 Nice to haves
-* Cut out first 2 pages of PDF
 * Suggested prompts, some kind of article summary at top or "You can ask questions about..."
-* Consider adding # embed_fcn = embedding_functions.HuggingFaceEmbeddingFunction(api_key="", model_name="medicalai/ClinicalBERT") back into manage_db if needed (need to add actual api_key), pair it with chunker from_pretrained("medicalai/ClinicalBERT")
-
