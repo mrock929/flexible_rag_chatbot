@@ -27,7 +27,9 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 1. Install Ollama for your operating system here https://github.com/ollama/ollama?tab=readme-ov-file#ollama.
 1. Update an environment variable to change the Ollama model save path to the models folder in this directory. Instructions for changing environment variables on different operating systems for Ollama are here https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server.
 1. Following the environment variable editing instructions above, change the `OLLAMA_MODELS` environment variable to be the path to the models directory in this project. For example `C:\projects\flexible_rag_chatbot\models\` on Windows or `~/username/projects/flexible_rag_chatbot/models/` on Mac.
-1. Follow the instructions below the Model library section (https://github.com/ollama/ollama?tab=readme-ov-file#model-library) to determine an appropriately sized model for your hardware. Llama 3.2 is recommended and has been tested extensively.
+1. Follow the instructions below the Model library section (https://github.com/ollama/ollama?tab=readme-ov-file#model-library) to determine an appropriately sized model for your hardware. 
+    1. Llama 3.2 is recommended for weak systems. 
+    1. If you intend to run the testing suite, the phi4 model or larger is highly recommended. This requires 16 GB of RAM to run. If you use a smaller model, the test suite will likely fail.
 1. Download the model using `ollama pull <model name>`, for example `ollama pull llama3.2`. This will likely need to be done from your default command line application and location (Command Prompt in Windows for example) unless you have updated the PATH for Ollama. You should now see the model name within the project directory under `/models/manifests/registry.ollama.ai/library/`.
 
 ## Running the app
@@ -42,18 +44,20 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 1. Then, use Control + c to stop the Docker container in the terminal.
 1. Once the application has stopped (sometimes it visually hangs, so start typing anyways once you see something like "Container container-name Stopped"), type `docker-compose down` into the terminal to stop the Docker container.
 
-## Running the testing framework in Docker
+## Running the testing framework
 1. Start Docker Desktop and Ollama.
-1. **Go to 2 files, set which model you want to test and which model you want to use to eval the results in X files TODO**
+1. **Go to 2 files, set which model you want to test and which model you want to use to eval the results in X files TODO**, be sure to have at least a ?B parameter model set as the eval model (phi4 seems to work ok at 14B, llama3.2 doesn't follow instructions well at 3B)
 1. In the project root, run `docker-compose build` in a terminal.
     1. If no code changes have happened, you will only have to do this step the first time.
-1. Once that completes, run `docker-compose run tests` to run the promptfoo-based test suite. Results will be saved to /data/promptfoo_test_output.json.
+1. Once that completes, run `docker-compose run tests` to run the promptfoo-based test suite. Results will be saved to /data/promptfoo_test_output.json. This will take several minutes.
     1. If you plan to do multiple test runs, for example with multiple models, be sure to rename this file before running the tests again.
-1. Once you are done testing, run `docker-compose down` to stop the Docker container.
+1. Once test finishes, run `docker-compose down` to stop the Docker container.
 
 # TODO
 * Set up metrics and test cases for promptfoo
-* For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this)
+* Do latency tests pass more frequently when `--max-concurrency 2` or 1?, consider having as a separate test too
+* Test model performance at temp=0, see chatbot.py line 167, top_p, top_k
+* For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this) - definitely tied to model, not just size. Focus in here, prompt tuning. Do temp first, may make big difference.
 * Prompt tuning based on test results for llama3.2 and phi4, others?
 * Once prompt is set, check some prompt hacking queries
 * Add thumbs up/down per response. Log this data along with query, reponse, sources, etc. in DB for RL or other improvements later.

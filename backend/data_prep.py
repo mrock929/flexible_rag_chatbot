@@ -2,12 +2,10 @@
 
 import glob
 from typing import List, Tuple
-from pathlib import Path
 import os
 
 import chromadb
 from PyPDF2 import PdfReader
-from dotenv import load_dotenv
 import semchunk
 from transformers import AutoTokenizer
 
@@ -136,7 +134,13 @@ def get_available_models() -> List[str]:
     if len(model_paths) < 1:
         raise OSError("No models were found in the /models/ directory. Be sure to download an open source model into the correct location. See README.md for more information.")
     
+    # Determine model suffix if present. For example, gemma3 vs gemma3:27b
     for model in model_paths:
-        model_list.append(model.split("/")[-1])
+        suffixes = glob.glob(f"{model}/*")
+        for suffix in suffixes:
+            if suffix.split("/")[-1] == "latest":
+                model_list.append(model.split("/")[-1])
+            else:
+                model_list.append(model.split("/")[-1] + ":" + suffix.split("/")[-1])
 
     return model_list

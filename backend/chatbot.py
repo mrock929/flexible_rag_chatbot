@@ -49,7 +49,6 @@ def update_query(query: str, model: str, history: List[dict]) -> str:
                 "role": "system",
                 "content": f"Use the below user query, article abstract, and recent chat history to create an updated user query that will return relevant context \
                     from the article to answer their question. If the current user query is sufficient, just return the same query.\
-                    Only return the updated user query and no additional text or explanation.\
                     BEGIN USER QUERY:\
                     {query}\
                     END USER QUERY\
@@ -73,7 +72,8 @@ def update_query(query: str, model: str, history: List[dict]) -> str:
                     in lymph node-positive disease. These data indicate that \
                     this gene may play a role in the biologic behavior and/or \
                     pathogenesis of human breast cancer.\
-                    END ARTICLE ABSTRACT"
+                    END ARTICLE ABSTRACT\
+                    Only return the updated user query and no additional text, explanation, or thought process."
             }
         ]
 
@@ -115,8 +115,7 @@ def generate_response(context: dict, model: str, history: List[dict]) -> str:
             {
                 "role": "system",
                 "content": f"You are an assistant that answers user questions based only on the supplied context and the article abstract. \
-                Only answer using information in the supplied context and abstract.\
-                If the context and abstract don't have the information needed to answer the question, just answer with 'I don't know the answer.'.\
+                Only answer using information in the following context and abstract.\
                 BEGIN CONTEXT:\
                 {context['documents']}\
                 END CONTEXT\
@@ -140,7 +139,9 @@ def generate_response(context: dict, model: str, history: List[dict]) -> str:
                 in lymph node-positive disease. These data indicate that \
                 this gene may play a role in the biologic behavior and/or \
                 pathogenesis of human breast cancer.\
-                END ABSTRACT"
+                END ABSTRACT\
+                If the context and abstract don't have the information needed to answer the question, just answer with 'I don't know the answer.' and no other text.\
+                Only include your answer an no additional reasoning or thought process."
             }
         ]
 
@@ -163,7 +164,7 @@ def generate_completion(message: List[dict], model: str) -> str:
     """
 
     client = Client(host='http://host.docker.internal:11434')
-    response = client.chat(model=model, messages=message)
+    response = client.chat(model=model, messages=message, options={"temperature": 0.0}) # TODO add temp here, likely options={"temperature": 0.0}
 
     return response.message.content
 

@@ -3,52 +3,28 @@ from typing import Dict, Any
 from chatbot import query_chatbot
 from data_prep import prepare_data
 
-LOCAL_TESTING_MODEL = "llama3.2"
+LOCAL_TESTING_MODEL = "gemma3"
 
-def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: 
-    # Note: The prompt may be in JSON format, so you might need to parse it.
-    # For example, if the prompt is a JSON string representing a conversation:
-    # prompt = '[{"role": "user", "content": "Hello, world!"}]'
-    # You would parse it like this:
-    # prompt = json.loads(prompt)
+def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict:
+    """
+    Functional call used by promptfoo to properly call the chatbot using the LOCAL_TESTING_MODEL
 
-    # The 'options' parameter contains additional configuration for the API call.
-    # config = options.get('config', None)
-    # additional_option = config.get('additionalOption', None)
+    Args:
+        prompt (str): Test case input prompt
+        options (Dict[str, Any]): Test case options (unused)
+        context (Dict[str, Any]): Test case context (unused)
 
-    # # The 'context' parameter provides info about which vars were used to create the final prompt.
-    # user_variable = context['vars'].get('userVariable', None)
-
-    # The prompt is the final prompt string after the variables have been processed.
-    # Custom logic to process the prompt goes here.
-    # For instance, you might call an external API or run some computations.
+    Returns:
+        dict: Model response
+    """
+   
     index = prepare_data()
     
     response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}])
-    # TODO likely change this to just get context and generate response directly without reworking input prompt, will be more consistent
 
     # The result should be a dictionary with at least an 'output' field.
     result = {
         "output": response["response"],
     }
 
-    # if some_error_condition:
-    #     result['error'] = "An error occurred during processing"
-
-    # if token_usage_calculated:
-    #     # If you want to report token usage, you can set the 'tokenUsage' field.
-    #     result['tokenUsage'] = {"total": token_count, "prompt": prompt_token_count, "completion": completion_token_count}
-
-    # if failed_guardrails:
-    #     # If guardrails triggered, you can set the 'guardrails' field.
-    #     result['guardrails'] = {"flagged": True}
-
     return result
-
-# def call_embedding_api(prompt: str) -> ProviderEmbeddingResponse:
-#     # Returns ProviderEmbeddingResponse
-#     pass
-
-# def call_classification_api(prompt: str) -> ProviderClassificationResponse:
-#     # Returns ProviderClassificationResponse
-#     pass

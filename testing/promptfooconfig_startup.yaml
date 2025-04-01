@@ -6,9 +6,3 @@ tests:
     assert:
       - type: icontains
         value: "I don't know the answer"
-      - type: factuality
-        value: "I don't know the answer."
-defaultTest:
-  options:
-    provider:
-      id: file://backend/custom_eval_provider.py
