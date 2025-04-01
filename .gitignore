@@ -3,4 +3,7 @@ data/*
 !data/chatbot_tests.csv
 models/*
 !models/.gitkeep
-.env
+testing/*
+!testing/chatbot_tests.csv
+!testing/promptfooconfig_startup.yaml
+!testing/promptfooconfig.yaml

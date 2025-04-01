@@ -1,0 +1,8 @@
+providers:
+  - id: file://../backend/custom_provider.py
+tests: file://../testing/chatbot_tests.csv
+prompts: 
+  - "{{input}}"
+# defaultTest: # This sets the LLM used to evaluate LLM-based metrics
+#   options:
+#     provider: openai:gpt-4o-mini

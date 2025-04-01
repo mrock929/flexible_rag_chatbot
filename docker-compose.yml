@@ -16,6 +16,9 @@ services:
     volumes:
       - ./data:/app/data  # Mount local /data folder to /app/data in the container
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
-    command: npx promptfoo eval --output ./data/promptfoo_test_output.json --max-concurrency 2  # Run promptfoo test suite
+      - ./testing:/app/testing  # Mount local /testing folder to /app/testing in the container
+    command: bash -c "npx promptfoo eval --config ./testing/promptfooconfig_startup.yaml --output ./testing/promptfoo_test_output.json  
+     && npx promptfoo eval --config ./testing/promptfooconfig.yaml --output ./testing/promptfoo_test_output.json"
+     # Run promptfoo test suite. Run _startup file first to download embedding model, which keeps it from being downloaded for each future test in parallel.
     depends_on:
       - chatbot

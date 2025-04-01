@@ -25,7 +25,6 @@ RUN npm install promptfoo
 # Copy the application files into the container
 COPY backend/ /app/backend/
 COPY streamlit_app.py .
-COPY promptfooconfig.yaml .
 
 # Expose the port Streamlit uses (default 8501)
 EXPOSE 8501
