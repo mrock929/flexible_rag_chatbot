@@ -38,7 +38,6 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# React to user input
 if prompt := st.chat_input("Type in your question."):
     # Display user message in chat message container
     st.chat_message("user").markdown(prompt)
@@ -68,10 +67,7 @@ if prompt := st.chat_input("Type in your question."):
 def clear_chat_history():
     st.session_state.messages = []
 
+# Create and manage sidebar
 with st.sidebar:
-    st.session_state.model = st.selectbox(
-        "Model Selection", model_list
-    )
-
+    st.session_state.model = st.selectbox("Model Selection", model_list)
     st.button(label="Clear History", key="chat_clear", on_click=clear_chat_history)
-    

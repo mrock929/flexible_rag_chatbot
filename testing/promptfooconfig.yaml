@@ -2,7 +2,7 @@ providers:
   - id: file://../backend/custom_provider.py
 prompts: 
   - "{{input}}"
-tests: file://../testing/chatbot_tests.csv
+tests: file://../testing/chatbot_tests_quality.csv
 defaultTest:
   options:
     provider:

@@ -1,13 +1,15 @@
 # Flexible RAG Chatbot
-This repo contains a flexible RAG chatbot that can be quickly and easily spun up on any machine running Docker to answer questions about text information in PDFs.
+This repo contains a flexible RAG chatbot that can be run on any computer with Docker to answer questions about text information in PDFs.
 
 ## Pre-installation Instructions
+This app requires Docker and Ollama to be installed on your computer in order to work. Follow the instructions below for your operating system to set these tools up.
+
 ### Docker and WSL Setup for Windows
-1. Sign up for a personal Docker account
+1. Sign up for a personal Docker account (https://app.docker.com/signup)
 1. Go to https://docs.docker.com/desktop/setup/install/windows-install/
 1. Follow the instructions to set up WSL. This will require a restart.
 1. After the restart, follow the best practices for setting up WSL on the same page as above.
-1. As part of the WSL setup it is recommended to use VSCode and and follow the instructions in that page for hooking them up.
+1. As part of the WSL setup it is recommended to use VSCode and and follow the instructions in that page for connecting VSCode and WSL.
 1. Follow the steps to download and configure Docker Desktop and WSL: https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-containers
     1. Be sure to specifically download the Docker Desktop version linked in the above page that has the WSL 2 backend.
 
@@ -27,10 +29,15 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 1. Install Ollama for your operating system here https://github.com/ollama/ollama?tab=readme-ov-file#ollama.
 1. Update an environment variable to change the Ollama model save path to the models folder in this directory. Instructions for changing environment variables on different operating systems for Ollama are here https://github.com/ollama/ollama/blob/main/docs/faq.md#how-do-i-configure-ollama-server.
 1. Following the environment variable editing instructions above, change the `OLLAMA_MODELS` environment variable to be the path to the models directory in this project. For example `C:\projects\flexible_rag_chatbot\models\` on Windows or `~/username/projects/flexible_rag_chatbot/models/` on Mac.
+1. If you used a terminal to set the environment variable. Close out of the terminal.
 1. Follow the instructions below the Model library section (https://github.com/ollama/ollama?tab=readme-ov-file#model-library) to determine an appropriately sized model for your hardware. 
-    1. Llama 3.2 is recommended for weak systems. 
-    1. If you intend to run the testing suite, the phi4 model or larger is highly recommended. This requires 16 GB of RAM to run. If you use a smaller model, the test suite will likely fail.
-1. Download the model using `ollama pull <model name>`, for example `ollama pull llama3.2`. This will likely need to be done from your default command line application and location (Command Prompt in Windows for example) unless you have updated the PATH for Ollama. You should now see the model name within the project directory under `/models/manifests/registry.ollama.ai/library/`.
+    1. Llama 3.2 is recommended for weak systems. Gemma3 is comparable, but slightly slower.
+    1. For stronger systems, Phi 4 works better than Llama 3.2, but can be slower for some queries.
+    1. Models to avoid:
+        1. deepseek-r1: Includes its chain of thought reasoning in output.
+        1. mistral: Very poor at following directions, so it does not restrict itself to the supplied context.
+    1. If you intend to run the testing suite, the Phi 4 model or larger is highly recommended. Gemma 3 27b also works well, but is slower. Phi 4 requires 16 GB of RAM to run. If you use a smaller model, the test suite will likely fail due to the model's inability to format the output correctly.
+1. Download the model using `ollama pull <model name>`, for example `ollama pull llama3.2`. This will likely need to be done from your default command line application and location (Command Prompt in Windows for example) unless you have updated the PATH for Ollama. You should now see the model name within the project directory under `/models/manifests/registry.ollama.ai/library/`. If you don't, be sure you set your environment variable correctly and try again.
 
 ## Running the app
 1. Start Docker Desktop.
@@ -42,29 +49,30 @@ This repo contains a flexible RAG chatbot that can be quickly and easily spun up
 1. Select the model you want to use from the sidebar and then use the chat interface to ask the model questions about your documents. You can use the "Clear History" button to clear the chat history and start a new conversation.
 1. Once you are done using the app, close the browser tab.
 1. Then, use Control + c to stop the Docker container in the terminal.
-1. Once the application has stopped (sometimes it visually hangs, so start typing anyways once you see something like "Container container-name Stopped"), type `docker-compose down` into the terminal to stop the Docker container.
+1. Once the application has stopped (sometimes it visually hangs, so start typing anyways once you see something like "Container container-name Stopped"), run `docker-compose down` in the terminal to stop the Docker container.
 
 ## Running the testing framework
+The testing framework is only recommended for developers working on this codebase.
+You need at least 16 GB of RAM to effectively run the testing framework.
+
 1. Start Docker Desktop and Ollama.
-1. **Go to 2 files, set which model you want to test and which model you want to use to eval the results in X files TODO**, be sure to have at least a ?B parameter model set as the eval model (phi4 seems to work ok at 14B, llama3.2 doesn't follow instructions well at 3B)
+1. Open /backend/custom_provider.py and set the `LOCAL_TESTING_MODEL` value (line 8) to be the name of the model you want to test. This name should be identical to the model name you used when downloading the model using Ollama, e.g. `"llama3.2"`. Make sure the model name is enclosed in double quotes. Save your changes.
+1. Open /backend/custom_eval_provider.py and set the `LOCAL_EVAL_MODEL` value (line 7) to be the name of the model you want to use for evaluation. This model should be different (preferably larger) than the local testing model. This model must have at least 14B parameters or the testing suite will likely fail. The recommended model is `"phi4"`. Save your changes.
 1. In the project root, run `docker-compose build` in a terminal.
     1. If no code changes have happened, you will only have to do this step the first time.
-1. Once that completes, run `docker-compose run tests` to run the promptfoo-based test suite. Results will be saved to /data/promptfoo_test_output.json. This will take several minutes.
-    1. If you plan to do multiple test runs, for example with multiple models, be sure to rename this file before running the tests again.
-1. Once test finishes, run `docker-compose down` to stop the Docker container.
+1. Once that completes, run `docker-compose run tests` to run the promptfoo-based test suite. Results will be saved to `/testing/promptfoo_test_output.json`. This will take several minutes.
+    1. If you plan to do multiple test runs, for example with multiple models, be sure to rename this file before running the tests again so you don't lose your results.
+    1. By default this will run the quality tests (tests of model output quality). If you want to run the model latency tests, change the `tests` line in the `/testing/promptfooconfig.yaml` to have `chatbot_tests_latency` instead of `chatbot_tests_quality` in the csv filename. The `--max-concurrency 1` flag should be added to the end of the tests service command in `docker-compose yaml` file. This ensures the full resources are available to run the model. This is especially important for larger models or weaker computer. Save your changes.
+1. Once the tests finish, run `docker-compose down` to stop the Docker container. You can review the high level test results in the table displayed in the terminal. Details can be found in the `/testing/promptfoo_test_output.json` file.
 
 # TODO
-* Set up metrics and test cases for promptfoo
-* Do latency tests pass more frequently when `--max-concurrency 2` or 1?, consider having as a separate test too
-* Test model performance at temp=0, see chatbot.py line 167, top_p, top_k
-* For local model, make sure it only uses the context - revisit later, may be tied to model size (ability to follow system prompt, test this) - definitely tied to model, not just size. Focus in here, prompt tuning. Do temp first, may make big difference.
-* Prompt tuning based on test results for llama3.2 and phi4, others?
-* Once prompt is set, check some prompt hacking queries
-* Add thumbs up/down per response. Log this data along with query, reponse, sources, etc. in DB for RL or other improvements later.
-* Consider adding a doc similarity threshold for retriever, trying other retrievers
-* Error handling/logging (No PDFs in /data)
-* Clean up streamlit code, remove prints, check all code, run black
+* git remove chatbot_test.csv, add chatbot_tests_latency and chatbot_tests_quality
+* Once prompt is set, check some prompt hacking queries (add to testing suite?)
+* Add thumbs up/down per response. Log this data along with query, response, sources, etc. in DB for RL or other improvements later.
+* Can likely remove a few things from initial RUN in dockerfile (git, others)
+* Remove prints (only in chatbot.py:query_chatbot), run black
 * Pick a license, add branch protections, make public
+* Test on Mac
 * Writeup.
 
 Nice to haves

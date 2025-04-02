@@ -24,16 +24,11 @@ def prepare_data() -> chromadb.Collection:
     if not os.path.isfile('./data/chromadb/chroma.sqlite3'):
         # Only read and chunk data if the DB doesn't exist
         file_text, filenames = read_data()
-        print("Files read")
         chunk_list, metadata_list, id_list = chunk_data(docs=file_text, doc_names=filenames)
-        print("Data chunked")
         collection = manage_db()
-        print("db set up")
         insert_data_to_db(collection=collection, chunk_list=chunk_list, metadata_list=metadata_list, id_list=id_list)
-        print("data added to db")
     else:
         collection = manage_db()
-        print("db set up")
 
     return collection
 
@@ -47,6 +42,9 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
     """
 
     files = glob.glob("./data/*.pdf")
+    if len(files) < 1:
+        raise OSError("No PDF files were found in the /data directory. Be sure to add at least one PDF file that you want to ask questions about.")
+
     extracted_files = []
     extracted_filenames = []
     for file in files:
@@ -57,7 +55,6 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
             file_text.append(page_text)
         extracted_files.append(file_text)
         extracted_filenames.append(file)
-        print(f"{len(reader.pages)} pages read from {file}.\n")
 
     return extracted_files, extracted_filenames
 
@@ -101,7 +98,7 @@ def manage_db() -> chromadb.Collection:
 
     # Create a collection if it doesn't already exist, default embedding model is sentence-transformers/all-MiniLM-L6-v2
     collection = chroma_client.get_or_create_collection(
-        name="docs", metadata={"hnsw:space": "cosine"}
+        name="docs", metadata={"hnsw:space": "ip"}
     )
 
     return collection

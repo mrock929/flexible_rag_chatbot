@@ -1,9 +1,11 @@
+# This file allows promptfoo to properly use the locally downloaded model for testing
+ 
 from typing import Dict, Any
 
 from chatbot import query_chatbot
 from data_prep import prepare_data
 
-LOCAL_TESTING_MODEL = "gemma3"
+LOCAL_TESTING_MODEL = "phi4"  # Change this model name to whichever model you want to test, the name should match the named used in the ollama pull command
 
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict:
     """

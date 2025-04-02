@@ -1,6 +1,6 @@
 FROM python:3.11
 
-# Install Node.js (needed for npx, which is needed for promptfoo)
+# Install Node.js and associated tools (needed for npm, which is needed for promptfoo)
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -19,7 +19,7 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install PromptFoo using npx (via npm)
+# Install PromptFoo using npm
 RUN npm install promptfoo
 
 # Copy the application files into the container

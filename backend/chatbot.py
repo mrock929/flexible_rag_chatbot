@@ -5,7 +5,7 @@ from typing import List
 from chromadb import Collection
 from ollama import Client
 
-NUM_RESULTS = 5
+NUM_RESULTS = 5  # Sets the number of chunks to return as context to the LLM
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
 
 
@@ -77,6 +77,7 @@ def update_query(query: str, model: str, history: List[dict]) -> str:
             }
         ]
 
+    # Add chat history
     for m in history[-MAX_HISTORY-1:]:
         message.append({"role": m["role"], "content": m["content"]})
 
@@ -141,10 +142,11 @@ def generate_response(context: dict, model: str, history: List[dict]) -> str:
                 pathogenesis of human breast cancer.\
                 END ABSTRACT\
                 If the context and abstract don't have the information needed to answer the question, just answer with 'I don't know the answer.' and no other text.\
-                Only include your answer an no additional reasoning or thought process."
+                Only include your answer and no additional reasoning or thought process."
             }
         ]
 
+    # Add chat history
     for m in history[-MAX_HISTORY-1:]:
         message.append({"role": m["role"], "content": m["content"]})
 
@@ -164,7 +166,7 @@ def generate_completion(message: List[dict], model: str) -> str:
     """
 
     client = Client(host='http://host.docker.internal:11434')
-    response = client.chat(model=model, messages=message, options={"temperature": 0.0}) # TODO add temp here, likely options={"temperature": 0.0}
+    response = client.chat(model=model, messages=message, options={"temperature": 0.0, "top_p": 0.5})
 
     return response.message.content
 
@@ -174,11 +176,11 @@ def compile_full_response(context: dict, response: str) -> dict:
     Compile the full response with sources
 
     Args:
-        context (dict): _description_
-        response (str): _description_
+        context (dict): The context provided to the LLM when generating the chat completion
+        response (str): Chat completion from the LLM
 
     Returns:
-        dict: _description_
+        dict: Dictionary with "sources" (list of the source files, pages, and similarity scores) and LLM response
     """
 
     sources = []
@@ -187,7 +189,7 @@ def compile_full_response(context: dict, response: str) -> dict:
         filename = (context["metadatas"][0][i]["filename"]).split("/")[-1]
         page = context["metadatas"][0][i]["page_number"]
         score = round(context["distances"][0][i], 3)
-        sources.append(f'{filename} page {page} with cosine similarity={score}')
+        sources.append(f'{filename} page {page}.')
                    
 
     return {"sources": sources, "response": response}
