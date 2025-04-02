@@ -26,23 +26,30 @@ def init_function() -> Tuple[Collection, List[str], Connection]:
 
     return index, model_list, connection
 
+
 def clear_chat_history():
     """Clear the chat history"""
     st.session_state.messages = []
+
 
 def feedback_button_good():
     """Update the most recent entry with positive user feedback"""
     if len(st.session_state.messages) > 1:
         update_entry_with_feedback(connection=connection, is_good=True)
     else:
-        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
-    
+        raise ValueError(
+            "Please use the chatbot before providing feedback on a response. Refresh the page to try again."
+        )
+
+
 def feedback_button_bad():
     """Update the most recent entry with negative user feedback"""
     if len(st.session_state.messages) > 1:
         update_entry_with_feedback(connection=connection, is_good=False)
     else:
-        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
+        raise ValueError(
+            "Please use the chatbot before providing feedback on a response. Refresh the page to try again."
+        )
 
 
 index, model_list, connection = init_function()
@@ -59,7 +66,9 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # Manage main chat area
-if prompt := st.chat_input("Ask a question like, 'What is this article about?' or 'What is the HER-2/neu gene?'"):
+if prompt := st.chat_input(
+    "Ask a question like, 'What is this article about?' or 'What is the HER-2/neu gene?'"
+):
     # Display user message in chat message container
     st.chat_message("user").markdown(prompt)
     # Add user message to chat history
@@ -73,19 +82,21 @@ if prompt := st.chat_input("Ask a question like, 'What is this article about?' o
             model=st.session_state.model,
             history=st.session_state.messages,
             connection=connection,
-            is_test=False
-        )   
+            is_test=False,
+        )
         st.write(response["response"])
 
         # Get unique list of pages used (we can have multiple chunks used per page)
         unique_sources = list(dict.fromkeys(response["sources"]))
-        
+
         # Display sources
         with st.expander("Sources"):
             for i, source in enumerate(unique_sources):
                 st.write(f"{i+1}. {source}")
-    
-    st.session_state.messages.append({"role": "assistant", "content": response["response"]})
+
+    st.session_state.messages.append(
+        {"role": "assistant", "content": response["response"]}
+    )
 
 # Create and manage sidebar
 with st.sidebar:

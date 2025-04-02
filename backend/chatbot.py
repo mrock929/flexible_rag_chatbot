@@ -13,7 +13,14 @@ NUM_RESULTS = 5  # Sets the number of chunks to return as context to the LLM
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
 
 
-def query_chatbot(query: str, index: Collection, model: str, history: List[dict], connection: Connection, is_test: bool) -> dict:
+def query_chatbot(
+    query: str,
+    index: Collection,
+    model: str,
+    history: List[dict],
+    connection: Connection,
+    is_test: bool,
+) -> dict:
     """
     Retrieves context based on the user query and then generates a response.
 
@@ -30,11 +37,21 @@ def query_chatbot(query: str, index: Collection, model: str, history: List[dict]
     """
     retrieval_query = update_query(query=query, model=model, history=history)
     context = retrieve_context(query=retrieval_query, index=index)
-    response, full_query = generate_response(context=context, model=model, history=history)
+    response, full_query = generate_response(
+        context=context, model=model, history=history
+    )
     chat_output = compile_full_response(context=context, response=response)
     if not is_test:
         time_now = str(datetime.now(timezone.utc))
-        add_tracking_entry(connection=connection, query_timestamp=time_now, user_query=query, retrieval_query=retrieval_query, full_query=full_query, llm_response=response, sources=chat_output["sources"])
+        add_tracking_entry(
+            connection=connection,
+            query_timestamp=time_now,
+            user_query=query,
+            retrieval_query=retrieval_query,
+            full_query=full_query,
+            llm_response=response,
+            sources=chat_output["sources"],
+        )
 
     return chat_output
 
@@ -53,9 +70,9 @@ def update_query(query: str, model: str, history: List[dict]) -> str:
     """
 
     message = [
-            {
-                "role": "system",
-                "content": f"Use the below user query, article abstract, and recent chat history to create an updated user query that will return relevant context \
+        {
+            "role": "system",
+            "content": f"Use the below user query, article abstract, and recent chat history to create an updated user query that will return relevant context \
                     from the article to answer their question. If the current user query is sufficient, just return the same query.\
                     BEGIN USER QUERY:\
                     {query}\
@@ -81,12 +98,12 @@ def update_query(query: str, model: str, history: List[dict]) -> str:
                     this gene may play a role in the biologic behavior and/or \
                     pathogenesis of human breast cancer.\
                     END ARTICLE ABSTRACT\
-                    Only return the updated user query and no additional text, explanation, or thought process."
-            }
-        ]
+                    Only return the updated user query and no additional text, explanation, or thought process.",
+        }
+    ]
 
     # Add chat history
-    for m in history[-MAX_HISTORY-1:]:
+    for m in history[-MAX_HISTORY - 1 :]:
         message.append({"role": m["role"], "content": m["content"]})
 
     return generate_completion(message=message, model=model)
@@ -107,7 +124,9 @@ def retrieve_context(query: str, index: Collection) -> dict:
     return index.query(query_texts=[query], n_results=NUM_RESULTS)
 
 
-def generate_response(context: dict, model: str, history: List[dict]) -> Tuple[str, str]:
+def generate_response(
+    context: dict, model: str, history: List[dict]
+) -> Tuple[str, str]:
     """
     Generate the response to the user query based on the supplied context, history, and user query.
 
@@ -121,9 +140,9 @@ def generate_response(context: dict, model: str, history: List[dict]) -> Tuple[s
     """
 
     message = [
-            {
-                "role": "system",
-                "content": f"You are an assistant that answers user questions based only on the supplied context and the article abstract. \
+        {
+            "role": "system",
+            "content": f"You are an assistant that answers user questions based only on the supplied context and the article abstract. \
                 Only answer using information in the following context and abstract.\
                 BEGIN CONTEXT:\
                 {context['documents']}\
@@ -150,16 +169,16 @@ def generate_response(context: dict, model: str, history: List[dict]) -> Tuple[s
                 pathogenesis of human breast cancer.\
                 END ABSTRACT\
                 If the context and abstract don't have the information needed to answer the question, just answer with 'I don't know the answer.' and no other text.\
-                Only include your answer and no additional reasoning or thought process."
-            }
-        ]
+                Only include your answer and no additional reasoning or thought process.",
+        }
+    ]
 
     # Add chat history
-    for m in history[-MAX_HISTORY-1:]:
+    for m in history[-MAX_HISTORY - 1 :]:
         message.append({"role": m["role"], "content": m["content"]})
 
     return generate_completion(message=message, model=model), message
-    
+
 
 def generate_completion(message: List[dict], model: str) -> str:
     """
@@ -173,8 +192,10 @@ def generate_completion(message: List[dict], model: str) -> str:
         str: Chat completion output message
     """
 
-    client = Client(host='http://host.docker.internal:11434')
-    response = client.chat(model=model, messages=message, options={"temperature": 0.0, "top_p": 0.5})
+    client = Client(host="http://host.docker.internal:11434")
+    response = client.chat(
+        model=model, messages=message, options={"temperature": 0.0, "top_p": 0.5}
+    )
 
     return response.message.content
 
@@ -197,7 +218,6 @@ def compile_full_response(context: dict, response: str) -> dict:
         filename = (context["metadatas"][0][i]["filename"]).split("/")[-1]
         page = context["metadatas"][0][i]["page_number"]
         score = round(context["distances"][0][i], 3)
-        sources.append(f'{filename} page {page}.')
-                   
+        sources.append(f"{filename} page {page}.")
 
     return {"sources": sources, "response": response}

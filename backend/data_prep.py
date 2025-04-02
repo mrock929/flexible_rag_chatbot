@@ -21,12 +21,19 @@ def prepare_data() -> chromadb.Collection:
         chromadb.Collection: ChromaDB collection with the input document chunked and embedded
     """
 
-    if not os.path.isfile('./data/chromadb/chroma.sqlite3'):
+    if not os.path.isfile("./data/chromadb/chroma.sqlite3"):
         # Only read and chunk data if the DB doesn't exist
         file_text, filenames = read_data()
-        chunk_list, metadata_list, id_list = chunk_data(docs=file_text, doc_names=filenames)
+        chunk_list, metadata_list, id_list = chunk_data(
+            docs=file_text, doc_names=filenames
+        )
         collection = manage_db()
-        insert_data_to_db(collection=collection, chunk_list=chunk_list, metadata_list=metadata_list, id_list=id_list)
+        insert_data_to_db(
+            collection=collection,
+            chunk_list=chunk_list,
+            metadata_list=metadata_list,
+            id_list=id_list,
+        )
     else:
         collection = manage_db()
 
@@ -43,7 +50,9 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
 
     files = glob.glob("./data/*.pdf")
     if len(files) < 1:
-        raise OSError("No PDF files were found in the /data directory. Be sure to add at least one PDF file that you want to ask questions about.")
+        raise OSError(
+            "No PDF files were found in the /data directory. Be sure to add at least one PDF file that you want to ask questions about."
+        )
 
     extracted_files = []
     extracted_filenames = []
@@ -59,7 +68,9 @@ def read_data() -> Tuple[List[List[str]], List[str]]:
     return extracted_files, extracted_filenames
 
 
-def chunk_data(docs: List[List[str]], doc_names: List[str]) -> Tuple[List[str], List[dict], List[str]]:
+def chunk_data(
+    docs: List[List[str]], doc_names: List[str]
+) -> Tuple[List[str], List[dict], List[str]]:
     """
     For all documents, break each page into smaller chunks for retrieval and embedding.
 
@@ -71,7 +82,12 @@ def chunk_data(docs: List[List[str]], doc_names: List[str]) -> Tuple[List[str], 
         Tuple[List[str], List[dict], List[str]]: List of text chunks, the associated metadata (filename, page_number, chunk_number), and doc id
     """
 
-    chunker = semchunk.chunkerify(tokenizer_or_token_counter=AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2"), chunk_size=CHUNK_SIZE)
+    chunker = semchunk.chunkerify(
+        tokenizer_or_token_counter=AutoTokenizer.from_pretrained(
+            "sentence-transformers/all-MiniLM-L6-v2"
+        ),
+        chunk_size=CHUNK_SIZE,
+    )
 
     chunk_text = []
     chunk_metadata = []
@@ -81,7 +97,9 @@ def chunk_data(docs: List[List[str]], doc_names: List[str]) -> Tuple[List[str], 
             chunks = chunker(text_or_texts=page, overlap=CHUNK_OVERLAP)
             for k, chunk in enumerate(chunks):
                 chunk_text.append(chunk)
-                chunk_metadata.append({"filename": doc_names[i], "page_number": j + 1, "chunk_number": k})
+                chunk_metadata.append(
+                    {"filename": doc_names[i], "page_number": j + 1, "chunk_number": k}
+                )
                 chunk_ids.append(f"{doc_names[i]}_page{j}_chunk{k}")
 
     return chunk_text, chunk_metadata, chunk_ids
@@ -104,7 +122,12 @@ def manage_db() -> chromadb.Collection:
     return collection
 
 
-def insert_data_to_db(collection: chromadb.Collection, chunk_list: List[str], metadata_list: List[dict], id_list: List[str]) -> None:
+def insert_data_to_db(
+    collection: chromadb.Collection,
+    chunk_list: List[str],
+    metadata_list: List[dict],
+    id_list: List[str],
+) -> None:
     """
     Embed and add all chunks of data to the ChromaDB
 
@@ -129,8 +152,10 @@ def get_available_models() -> List[str]:
 
     model_paths = glob.glob("./models/manifests/registry.ollama.ai/library/*")
     if len(model_paths) < 1:
-        raise OSError("No models were found in the /models/ directory. Be sure to download an open source model into the correct location. See README.md for more information.")
-    
+        raise OSError(
+            "No models were found in the /models/ directory. Be sure to download an open source model into the correct location. See README.md for more information."
+        )
+
     # Determine model suffix if present. For example, gemma3 vs gemma3:27b
     for model in model_paths:
         suffixes = glob.glob(f"{model}/*")

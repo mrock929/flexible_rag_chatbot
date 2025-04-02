@@ -7,6 +7,7 @@ from data_prep import prepare_data
 
 LOCAL_TESTING_MODEL = "llama3.2"  # Change this model name to whichever model you want to test, the name should match the named used in the ollama pull command
 
+
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict:
     """
     Functional call used by promptfoo to properly call the chatbot using the LOCAL_TESTING_MODEL
@@ -19,10 +20,17 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
     Returns:
         dict: Model response
     """
-   
+
     index = prepare_data()
-    
-    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}], connection=None, is_test=True)
+
+    response = query_chatbot(
+        query=prompt,
+        index=index,
+        model=LOCAL_TESTING_MODEL,
+        history=[{"role": "user", "content": prompt}],
+        connection=None,
+        is_test=True,
+    )
 
     # The result should be a dictionary with at least an 'output' field.
     result = {

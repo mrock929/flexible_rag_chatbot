@@ -9,15 +9,27 @@ def manage_tracking_db() -> sqlite3.Connection:
     """Connect to the chatbot_data database. Create it if it doesn't exist.
     Creates the chatbot table. Primary key is (query_timestamp, user_query)"""
 
-    con = sqlite3.connect("/app/data/chatbot_data.db", check_same_thread=False)  # Only one execute at a time will be run, so check_same_thread=False is safe
+    con = sqlite3.connect(
+        "/app/data/chatbot_data.db", check_same_thread=False
+    )  # Only one execute at a time will be run, so check_same_thread=False is safe
     cursor = con.cursor()
 
-    cursor.execute("CREATE TABLE IF NOT EXISTS chatbot(query_timestamp, user_query, retrieval_query, full_query, llm_response, sources, is_good)")
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS chatbot(query_timestamp, user_query, retrieval_query, full_query, llm_response, sources, is_good)"
+    )
 
     return con
 
 
-def add_tracking_entry(connection: sqlite3.Connection, query_timestamp: str, user_query: str, retrieval_query: str, full_query: str, llm_response: str, sources: List[str]) -> None:
+def add_tracking_entry(
+    connection: sqlite3.Connection,
+    query_timestamp: str,
+    user_query: str,
+    retrieval_query: str,
+    full_query: str,
+    llm_response: str,
+    sources: List[str],
+) -> None:
     """
     Add an entry to the chatbot data tracking database. Primary key is (query_timestamp, user_query)
 
@@ -34,7 +46,17 @@ def add_tracking_entry(connection: sqlite3.Connection, query_timestamp: str, use
     cursor = connection.cursor()
 
     # is_good is the final column. This is NULL until the user clicks the UI button that designates this response as good or bad
-    cursor.execute("""INSERT INTO chatbot (query_timestamp, user_query, retrieval_query, full_query, llm_response, sources) VALUES (?, ?, ?, ?, ?, ?)""", (query_timestamp, user_query, retrieval_query, json.dumps(full_query), llm_response, json.dumps(sources)))
+    cursor.execute(
+        """INSERT INTO chatbot (query_timestamp, user_query, retrieval_query, full_query, llm_response, sources) VALUES (?, ?, ?, ?, ?, ?)""",
+        (
+            query_timestamp,
+            user_query,
+            retrieval_query,
+            json.dumps(full_query),
+            llm_response,
+            json.dumps(sources),
+        ),
+    )
     connection.commit()
 
 
@@ -49,10 +71,15 @@ def update_entry_with_feedback(connection: sqlite3.Connection, is_good: bool) ->
     cursor = connection.cursor()
 
     # Assume we're using the most recent entry
-    output = cursor.execute("""SELECT query_timestamp, user_query FROM chatbot WHERE query_timestamp == (SELECT MAX(query_timestamp) FROM chatbot)""")
+    output = cursor.execute(
+        """SELECT query_timestamp, user_query FROM chatbot WHERE query_timestamp == (SELECT MAX(query_timestamp) FROM chatbot)"""
+    )
     row = output.fetchone()
     query_timestamp = row[0]
     user_query = row[1]
 
-    cursor.execute("""UPDATE chatbot SET is_good = ? WHERE query_timestamp = ? AND user_query = ?""", (is_good, query_timestamp, user_query))
+    cursor.execute(
+        """UPDATE chatbot SET is_good = ? WHERE query_timestamp = ? AND user_query = ?""",
+        (is_good, query_timestamp, user_query),
+    )
     connection.commit()

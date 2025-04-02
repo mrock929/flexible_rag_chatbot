@@ -6,7 +6,8 @@ from chatbot import generate_completion
 
 LOCAL_EVAL_MODEL = "phi4"  # Not recommended to go below 14B parameter model
 
-def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: 
+
+def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict:
     """
     Functional call used by promptfoo to properly call the evaluation model using the LOCAL_EVAL_MODEL
 
@@ -18,8 +19,10 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
     Returns:
         dict: Model response
     """
-    
-    response = generate_completion(message=[{"role": "user", "content": prompt}], model=LOCAL_EVAL_MODEL)
+
+    response = generate_completion(
+        message=[{"role": "user", "content": prompt}], model=LOCAL_EVAL_MODEL
+    )
 
     # The result should be a dictionary with at least an 'output' field.
     result = {

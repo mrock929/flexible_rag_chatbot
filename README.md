@@ -64,13 +64,3 @@ You need at least 16 GB of RAM to effectively run the testing framework.
     1. If you plan to do multiple test runs, for example with multiple models, be sure to rename this file before running the tests again so you don't lose your results.
     1. By default this will run the quality tests (tests of model output quality). If you want to run the model latency tests, change the `tests` line in the `/testing/promptfooconfig.yaml` to have `chatbot_tests_latency` instead of `chatbot_tests_quality` in the csv filename. The `--max-concurrency 1` flag should be added to the end of the tests service command in `docker-compose yaml` file. This ensures the full resources are available to run the model. This is especially important for larger models or weaker computer. Save your changes.
 1. Once the tests finish, run `docker-compose down` to stop the Docker container. You can review the high level test results in the table displayed in the terminal. Details can be found in the `/testing/promptfoo_test_output.json` file.
-
-# TODO
-* git remove chatbot_test.csv, add chatbot_tests_latency and chatbot_tests_quality
-* run black
-* add branch protections, make public
-* Test on Mac
-* Writeup.
-
-Nice to haves
-* Suggested prompts, some kind of article summary at top or "You can ask questions about..."
