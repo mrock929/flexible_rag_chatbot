@@ -1,5 +1,6 @@
 # This file controls the UI action in the streamlit app
 
+from sqlite3 import Connection
 from typing import Tuple, List
 
 from chromadb import Collection
@@ -7,25 +8,27 @@ import streamlit as st
 
 from backend.data_prep import prepare_data, get_available_models
 from backend.chatbot import query_chatbot
+from backend.data_tracking import manage_tracking_db, update_entry_with_feedback
 
 
 # Initialize DB at start only
 @st.cache_resource
-def init_function() -> Tuple[Collection, List[str]]:
+def init_function() -> Tuple[Collection, List[str], Connection]:
     """
-    Initialize the backend. This includes ingesting data and connecting to the vector database.
+    Initialize the backend. This includes ingesting data, connecting to the vector database, and connecting to the data tracking database.
     This only runs on app startup.
 
     Returns:
-        Tuple[Collection, List[str]]: A tuple with the DB containing the embedded and chunked data and the list of available models.
+        Tuple[Collection, List[str]]: A tuple with the DB containing the embedded and chunked data, the list of available models, and the database cursor for the data tracking db.
     """
     index = prepare_data()
     model_list = get_available_models()
+    connection = manage_tracking_db()
 
-    return index, model_list
+    return index, model_list, connection
 
 
-index, model_list = init_function()
+index, model_list, connection = init_function()
 
 st.title("Flexible RAG Chatbot")
 
@@ -51,6 +54,8 @@ if prompt := st.chat_input("Type in your question."):
             index=index,
             model=st.session_state.model,
             history=st.session_state.messages,
+            connection=connection,
+            is_test=False
         )   
         st.write(response["response"])
 
@@ -67,7 +72,24 @@ if prompt := st.chat_input("Type in your question."):
 def clear_chat_history():
     st.session_state.messages = []
 
+def feedback_button_good():
+    # Update the most recent entry with positive user feedback
+    if len(st.session_state.messages) > 1:
+        update_entry_with_feedback(connection=connection, is_good=True)
+    else:
+        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
+    
+def feedback_button_bad():
+    # Update the most recent entry with negative user feedback
+    if len(st.session_state.messages) > 1:
+        update_entry_with_feedback(connection=connection, is_good=False)
+    else:
+        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
+
 # Create and manage sidebar
 with st.sidebar:
     st.session_state.model = st.selectbox("Model Selection", model_list)
     st.button(label="Clear History", key="chat_clear", on_click=clear_chat_history)
+    st.header("Model Response Feedback")
+    st.button(label="Good", key="good_feedback", on_click=feedback_button_good)
+    st.button(label="Bad", key="bad_feedback", on_click=feedback_button_bad)

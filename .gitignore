@@ -4,7 +4,8 @@ data/*
 models/*
 !models/.gitkeep
 testing/*
-!testing/chatbot_tests.csv
+!testing/chatbot_tests_latency.csv
+!testing/chatbot_tests_quality.csv
 !testing/promptfooconfig_startup.yaml
 !testing/promptfooconfig.yaml
 .env

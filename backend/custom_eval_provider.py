@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from chatbot import generate_completion
 
-LOCAL_EVAL_MODEL = "gemma3:27b"  # Not recommended to go below 14B parameter model
+LOCAL_EVAL_MODEL = "phi4"  # Not recommended to go below 14B parameter model
 
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict: 
     """

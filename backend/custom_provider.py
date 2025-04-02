@@ -1,11 +1,12 @@
 # This file allows promptfoo to properly use the locally downloaded model for testing
- 
+
+from sqlite3 import Connection
 from typing import Dict, Any
 
 from chatbot import query_chatbot
 from data_prep import prepare_data
 
-LOCAL_TESTING_MODEL = "phi4"  # Change this model name to whichever model you want to test, the name should match the named used in the ollama pull command
+LOCAL_TESTING_MODEL = "llama3.2"  # Change this model name to whichever model you want to test, the name should match the named used in the ollama pull command
 
 def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> dict:
     """
@@ -22,7 +23,7 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
    
     index = prepare_data()
     
-    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}])
+    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}], cursor=Connection(), is_test=True)
 
     # The result should be a dictionary with at least an 'output' field.
     result = {

@@ -3,7 +3,6 @@ FROM python:3.11
 # Install Node.js and associated tools (needed for npm, which is needed for promptfoo)
 RUN apt-get update && apt-get install -y \
     curl \
-    git \
     gnupg2 \
     lsb-release \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \

@@ -1,15 +1,19 @@
 # File to create OpenAI chatbot responses based on user queries
 
-from typing import List
+from datetime import datetime, timezone
+from sqlite3 import Connection
+from typing import List, Tuple
 
 from chromadb import Collection
 from ollama import Client
+
+from .data_tracking import add_tracking_entry
 
 NUM_RESULTS = 5  # Sets the number of chunks to return as context to the LLM
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
 
 
-def query_chatbot(query: str, index: Collection, model: str, history: List[dict]) -> dict:
+def query_chatbot(query: str, index: Collection, model: str, history: List[dict], connection: Connection, is_test: bool) -> dict:
     """
     Retrieves context based on the user query and then generates a response.
 
@@ -18,15 +22,20 @@ def query_chatbot(query: str, index: Collection, model: str, history: List[dict]
         index (Collection): Chunked and embedded text to retrieve from
         model (str): The selected LLM to use for generating the response
         history (List[dict]): History of the chat session
+        connection (sqlite3.Connection): Valid sqlite3 connection for the database
+        is_test (bool): True if test suite is running, False otherwise. This is to avoid saving all test queries in data tracking db
 
     Returns:
         dict: The response to the user's query from the model. Dictionary with "response" (str) and "sources" (List[str]).
     """
-    full_query = update_query(query=query, model=model, history=history)
-    print(f"query={query}\nfull query={full_query}\n")
-    context = retrieve_context(query=full_query, index=index)
-    response = generate_response(context=context, model=model, history=history)
+    retrieval_query = update_query(query=query, model=model, history=history)
+    print(f"query={query}\nfull query={retrieval_query}\n")
+    context = retrieve_context(query=retrieval_query, index=index)
+    response, full_query = generate_response(context=context, model=model, history=history)
     chat_output = compile_full_response(context=context, response=response)
+    if not is_test:
+        time_now = str(datetime.now(timezone.utc))
+        add_tracking_entry(connection=connection, query_timestamp=time_now, user_query=query, retrieval_query=retrieval_query, full_query=full_query, llm_response=response, sources=chat_output["sources"])
 
     return chat_output
 
@@ -99,7 +108,7 @@ def retrieve_context(query: str, index: Collection) -> dict:
     return index.query(query_texts=[query], n_results=NUM_RESULTS)
 
 
-def generate_response(context: dict, model: str, history: List[dict]) -> str:
+def generate_response(context: dict, model: str, history: List[dict]) -> Tuple[str, str]:
     """
     Generate the response to the user query based on the supplied context, history, and user query.
 
@@ -109,7 +118,7 @@ def generate_response(context: dict, model: str, history: List[dict]) -> str:
         history (List[dict]): Chat history, including the user query
 
     Returns:
-        str: The Gen AI generated response to the user query
+        Tuple[str, str]: The Gen AI generated response to the user query and the full query sent to the LLM
     """
 
     message = [
@@ -150,7 +159,7 @@ def generate_response(context: dict, model: str, history: List[dict]) -> str:
     for m in history[-MAX_HISTORY-1:]:
         message.append({"role": m["role"], "content": m["content"]})
 
-    return generate_completion(message=message, model=model)
+    return generate_completion(message=message, model=model), message
     
 
 def generate_completion(message: List[dict], model: str) -> str:

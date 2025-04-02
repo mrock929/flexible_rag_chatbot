@@ -1,0 +1,13 @@
+input,__expected
+What is the her2-neu gene?,latency(10000):
+Summarize this article in plain language,latency(10000):
+What are the most important takeaways from this article?,latency(10000):
+What is the relationship between the HER-2/neu gene and the epidermal growth factor receptor (EGFR)?,latency(10000):
+What prognostic significance does the amplification of the HER-2/neu gene have in breast cancer?,latency(10000):
+What factors were evaluated in the breast cancer study to assess the prognosis of patients?,latency(10000):
+What was the correlation between HER-2/neu gene amplification and the number of positive lymph nodes in the study?,latency(10000):
+What were the results of the second study on 100 node-positive breast cancer patients regarding HER-2/neu amplification and its correlation with disease parameters?,latency(10000):
+What was the significance of HER-2/neu gene amplification in predicting relapse and survival in node-positive breast cancer patients?,latency(10000):
+What were the findings regarding the epidermal growth factor receptor (EGFR) gene amplification and rearrangement in breast cancer samples?,latency(10000):
+"What role does HER-2/neu gene amplification play in breast cancer prognosis, and how does it compare to other prognostic factors?",latency(10000):
+What is the potential significance of HER-2/neu amplification in breast cancer pathogenesis and how does it relate to other proto-oncogenes like N-myc?,latency(10000):
