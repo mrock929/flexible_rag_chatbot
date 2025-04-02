@@ -171,11 +171,15 @@ def generate_completion(message: List[dict], openai_client: OpenAI, model: str) 
         completion = openai_client.chat.completions.create(
             model=model,
             messages=message,
+            temperature=0.0,
+            top_p=0.5
         )
         return completion.choices[0].message.content
     else:
         client = Client(host='http://host.docker.internal:11434')
-        response = client.chat(model=model, messages=message)
+        response = client.chat(
+            model=model, messages=message, options={"temperature": 0.0, "top_p": 0.5}
+        )
 
         return response.message.content
 
