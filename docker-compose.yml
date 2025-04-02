@@ -17,8 +17,10 @@ services:
       - ./data:/app/data  # Mount local /data folder to /app/data in the container
       - ./models:/app/models  # Mount local /models folder to /app/models in the container
       - ./testing:/app/testing  # Mount local /testing folder to /app/testing in the container
+    environment:
+      - PYTHONPATH=/app
+    # Run promptfoo test suite. Run _startup file first to download embedding model, which keeps it from being downloaded for each future test in parallel.
     command: bash -c "npx promptfoo eval --config ./testing/promptfooconfig_startup.yaml --output ./testing/promptfoo_test_output.json  
      && npx promptfoo eval --config ./testing/promptfooconfig.yaml --output ./testing/promptfoo_test_output.json"
-     # Run promptfoo test suite. Run _startup file first to download embedding model, which keeps it from being downloaded for each future test in parallel.
     depends_on:
       - chatbot

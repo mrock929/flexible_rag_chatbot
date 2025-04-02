@@ -7,7 +7,7 @@ from typing import List, Tuple
 from chromadb import Collection
 from ollama import Client
 
-from .data_tracking import add_tracking_entry
+from backend.data_tracking import add_tracking_entry
 
 NUM_RESULTS = 5  # Sets the number of chunks to return as context to the LLM
 MAX_HISTORY = 4  # Sets the number of previous messages to include in the history
@@ -29,7 +29,6 @@ def query_chatbot(query: str, index: Collection, model: str, history: List[dict]
         dict: The response to the user's query from the model. Dictionary with "response" (str) and "sources" (List[str]).
     """
     retrieval_query = update_query(query=query, model=model, history=history)
-    print(f"query={query}\nfull query={retrieval_query}\n")
     context = retrieve_context(query=retrieval_query, index=index)
     response, full_query = generate_response(context=context, model=model, history=history)
     chat_output = compile_full_response(context=context, response=response)

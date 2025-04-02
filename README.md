@@ -67,11 +67,8 @@ You need at least 16 GB of RAM to effectively run the testing framework.
 
 # TODO
 * git remove chatbot_test.csv, add chatbot_tests_latency and chatbot_tests_quality
-* Once prompt is set, check some prompt hacking queries (add to testing suite?)
-* Add thumbs up/down per response. Log this data along with query, response, sources, etc. in DB for RL or other improvements later.
-* Can likely remove a few things from initial RUN in dockerfile (git, others)
-* Remove prints (only in chatbot.py:query_chatbot), run black
-* Pick a license, add branch protections, make public
+* run black
+* add branch protections, make public
 * Test on Mac
 * Writeup.
 

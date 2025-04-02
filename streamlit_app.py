@@ -11,7 +11,6 @@ from backend.chatbot import query_chatbot
 from backend.data_tracking import manage_tracking_db, update_entry_with_feedback
 
 
-# Initialize DB at start only
 @st.cache_resource
 def init_function() -> Tuple[Collection, List[str], Connection]:
     """
@@ -27,6 +26,24 @@ def init_function() -> Tuple[Collection, List[str], Connection]:
 
     return index, model_list, connection
 
+def clear_chat_history():
+    """Clear the chat history"""
+    st.session_state.messages = []
+
+def feedback_button_good():
+    """Update the most recent entry with positive user feedback"""
+    if len(st.session_state.messages) > 1:
+        update_entry_with_feedback(connection=connection, is_good=True)
+    else:
+        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
+    
+def feedback_button_bad():
+    """Update the most recent entry with negative user feedback"""
+    if len(st.session_state.messages) > 1:
+        update_entry_with_feedback(connection=connection, is_good=False)
+    else:
+        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
+
 
 index, model_list, connection = init_function()
 
@@ -41,7 +58,8 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("Type in your question."):
+# Manage main chat area
+if prompt := st.chat_input("Ask a question like, 'What is this article about?' or 'What is the HER-2/neu gene?'"):
     # Display user message in chat message container
     st.chat_message("user").markdown(prompt)
     # Add user message to chat history
@@ -68,23 +86,6 @@ if prompt := st.chat_input("Type in your question."):
                 st.write(f"{i+1}. {source}")
     
     st.session_state.messages.append({"role": "assistant", "content": response["response"]})
-
-def clear_chat_history():
-    st.session_state.messages = []
-
-def feedback_button_good():
-    # Update the most recent entry with positive user feedback
-    if len(st.session_state.messages) > 1:
-        update_entry_with_feedback(connection=connection, is_good=True)
-    else:
-        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
-    
-def feedback_button_bad():
-    # Update the most recent entry with negative user feedback
-    if len(st.session_state.messages) > 1:
-        update_entry_with_feedback(connection=connection, is_good=False)
-    else:
-        raise ValueError("Please use the chatbot before providing feedback on a response. Refresh the page to try again.")
 
 # Create and manage sidebar
 with st.sidebar:

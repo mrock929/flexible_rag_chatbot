@@ -1,6 +1,5 @@
 # This file allows promptfoo to properly use the locally downloaded model for testing
 
-from sqlite3 import Connection
 from typing import Dict, Any
 
 from chatbot import query_chatbot
@@ -23,7 +22,7 @@ def call_api(prompt: str, options: Dict[str, Any], context: Dict[str, Any]) -> d
    
     index = prepare_data()
     
-    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}], cursor=Connection(), is_test=True)
+    response = query_chatbot(query=prompt, index=index, model=LOCAL_TESTING_MODEL, history=[{"role": "user", "content": prompt}], connection=None, is_test=True)
 
     # The result should be a dictionary with at least an 'output' field.
     result = {
