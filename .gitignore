@@ -1,6 +1,6 @@
 data/*
 !data/.gitkeep 
-!data/chatbot_tests.csv
+!data/SlamonetalSCIENCE1987_short.pdf
 models/*
 !models/.gitkeep
 testing/*
