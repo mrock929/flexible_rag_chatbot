@@ -2,7 +2,7 @@
 This repo contains a flexible RAG chatbot that can be run on any computer with Docker to answer questions about text information in PDFs.
 
 ## Pre-installation Instructions
-This app requires Docker and Ollama to be installed on your computer in order to work. Follow the instructions below for your operating system to set these tools up.
+This app requires Docker to be installed on your computer in order to work. Follow the instructions below for your operating system to set these tools up.
 
 ### Docker and WSL Setup for Windows
 1. Sign up for a personal Docker account (https://app.docker.com/signup)
@@ -73,3 +73,6 @@ You need at least 16 GB of RAM to effectively run the testing framework.
     1. If you plan to do multiple test runs, for example with multiple models, be sure to rename this file before running the tests again so you don't lose your results.
     1. By default this will run the quality tests (tests of model output quality). If you want to run the model latency tests, change the `tests` line in the `/testing/promptfooconfig.yaml` to have `chatbot_tests_latency` instead of `chatbot_tests_quality` in the csv filename. When running the latency tests, the `--max-concurrency 1` flag should be added to the end of the tests service command in the `docker-compose yaml` file. This ensures the full resources are available to run the model. This is especially important for larger models or weaker computer. Save your changes.
 1. Once the tests finish, run `docker-compose down` to stop the Docker container. You can review the high level test results in the table displayed in the terminal. Details can be found in the `/testing/promptfoo_test_output.json` file.
+
+### Viewing the data tracking data
+1. All queries, responses, and user feedback are tracked in `/data/chatbot_data.db`. You can open this database with an appropriate tool (if using VSCode, the SQLite Viewer works well) and view all of the stored data.
