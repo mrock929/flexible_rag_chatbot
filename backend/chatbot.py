@@ -160,7 +160,7 @@ def compile_full_response(context: dict, response: str) -> dict:
         filename = (context["metadatas"][0][i]["filename"]).split("/")[-1]
         page = context["metadatas"][0][i]["page_number"]
         score = round(context["distances"][0][i], 3)
-        sources.append(f'{filename} page {page} with cosine similarity={score}')
+        sources.append(f'{filename} page {page} with similarity={score}')
                    
 
     return {"sources": sources, "response": response}
