@@ -116,7 +116,7 @@ def manage_db() -> chromadb.Collection:
 
     # Create a collection if it doesn't already exist, default embedding model is sentence-transformers/all-MiniLM-L6-v2
     collection = chroma_client.get_or_create_collection(
-        name="docs", metadata={"hnsw:space": "cosine"}
+        name="docs", metadata={"hnsw:space": "ip"}
     )
 
     return collection

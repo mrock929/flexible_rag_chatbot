@@ -50,33 +50,12 @@ def update_query(query: str, model: str, client: OpenAI, history: List[dict]) ->
     message = [
             {
                 "role": "system",
-                "content": f"Use the below user query, article abstract, and recent chat history to create an updated user query that will return relevant context \
+                "content": f"Use the below user query and recent chat history to create an updated user query that will return relevant context \
                     from the article to answer their question. If the current user query is sufficient, just return the same query.\
                     Only return the updated user query and no additional text or explanation.\
                     BEGIN USER QUERY:\
                     {query}\
-                    END USER QUERY\
-                    BEGIN ARTICLE ABSTRACT:\
-                    The HER-2/neu oncogene is a member of the erbB-like \
-                    oncogene family, and is related to, but distinct from, the \
-                    epidermal growth factor receptor. This gene has been \
-                    shown to be amplified in human breast cancer cell lines. \
-                    In the current study, alterations of the gene in 189 \
-                    primary human breast cancers were investigated. HER-2/ \
-                    neu was found to be amplified from 2- to greater than 20- \
-                    fold in 30% of the tumors. Correlation of gene amplification \
-                    with several disease parameters was evaluated. Amplification \
-                    of the HER-2/neu gene was a significant predictor \
-                    of both overall survival and time to relapse in \
-                    patients with breast cancer. It retained its significance \
-                    even when adjustments were made for other known \
-                    prognostic factors. Moreover, HER-2/neu amplification \
-                    had greater prognostic value than most currently used \
-                    prognostic factors, incuding hormonal-receptor status, \
-                    in lymph node-positive disease. These data indicate that \
-                    this gene may play a role in the biologic behavior and/or \
-                    pathogenesis of human breast cancer.\
-                    END ARTICLE ABSTRACT"
+                    END USER QUERY"
             }
         ]
 
@@ -118,33 +97,12 @@ def generate_response(context: dict, client: OpenAI, model: str, history: List[d
     message = [
             {
                 "role": "system",
-                "content": f"You are an assistant that answers user questions based only on the supplied context and the article abstract. \
-                Only answer using information in the supplied context and abstract.\
-                If the context and abstract don't have the information needed to answer the question, just answer with 'I don't know the answer.'.\
+                "content": f"You are an assistant that answers user questions based only on the supplied context. \
+                Only answer using information in the supplied context.\
+                If the context doesn't have the information needed to answer the question, just answer with 'I don't know the answer.'.\
                 BEGIN CONTEXT:\
                 {context['documents']}\
-                END CONTEXT\
-                BEGIN ABSTRACT:\
-                The HER-2/neu oncogene is a member of the erbB-like \
-                oncogene family, and is related to, but distinct from, the \
-                epidermal growth factor receptor. This gene has been \
-                shown to be amplified in human breast cancer cell lines. \
-                In the current study, alterations of the gene in 189 \
-                primary human breast cancers were investigated. HER-2/ \
-                neu was found to be amplified from 2- to greater than 20- \
-                fold in 30% of the tumors. Correlation of gene amplification \
-                with several disease parameters was evaluated. Amplification \
-                of the HER-2/neu gene was a significant predictor \
-                of both overall survival and time to relapse in \
-                patients with breast cancer. It retained its significance \
-                even when adjustments were made for other known \
-                prognostic factors. Moreover, HER-2/neu amplification \
-                had greater prognostic value than most currently used \
-                prognostic factors, incuding hormonal-receptor status, \
-                in lymph node-positive disease. These data indicate that \
-                this gene may play a role in the biologic behavior and/or \
-                pathogenesis of human breast cancer.\
-                END ABSTRACT"
+                END CONTEXT"
             }
         ]
 
